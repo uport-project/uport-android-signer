@@ -128,26 +128,6 @@ class HDSignerTests {
         latch.await()
     }
 
-    @Test
-    fun getPrivateKeyForPath() {
-
-        val referenceSeedPhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
-        val referenceSeedAddress = "0x794adde0672914159c1b77dd06d047904fe96ac8"
-        ensureSeedIsImported(referenceSeedPhrase)
-
-        val referencePrivateKey = "ZfxnDZNRy4fR9WcC+1angyriqrNCe+lEq4yfKgq4eWA="
-        UportHDSigner().getPrivateKeyForPath(
-                mActivityRule.activity,
-                referenceSeedAddress,
-                UportHDSigner.UPORT_ROOT_DERIVATION_PATH,
-                "",
-                { err, encodedKey ->
-                    assertNull(err)
-                    assertEquals(referencePrivateKey, encodedKey)
-                }
-        )
-    }
-
     private fun ensureSeedIsImported(phrase: String) {
         //ensure seed is imported
         val latch = CountDownLatch(1)

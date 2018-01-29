@@ -212,46 +212,6 @@ class UportHDSigner : UportSigner() {
         })
     }
 
-    /**
-     * FIXME: this method is a temporary workaround, it should be removed as soon as possible as it represents a security risk.
-     * The method exists because the result is used to derive encryption keys for push notifications.
-     * The push encryption method is not yet implemented in native so this is used instead.
-     *
-     *
-     * Decrypts the seed that generated the given [rootAddress] and derives a private key using the [derivationPath]
-     * The respective seed must have been previously generated or imported.
-     * The result is passed back to the calling code as a [Base64] encoded string using the provided [callback]
-     */
-    fun getPrivateKeyForPath(context: Context, rootAddress: String, derivationPath: String, prompt: String, callback: (err: Exception?, encodedKey: String) -> Unit) {
-
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
-
-        if (storageError != null) {
-            return callback(storageError, "")
-        }
-
-        encryptionLayer.decrypt(context, prompt, encryptedEntropy, { err, entropyBuff ->
-            if (err != null) {
-                return@decrypt callback(storageError, "")
-            }
-
-            try {
-                val phrase = Mnemonic.entropyToMnemonic(entropyBuff)
-                val seed = Mnemonic.mnemonicToSeed(phrase)
-                val extendedKey = generateKey(seed, derivationPath)
-
-                val keyPair = extendedKey.getKeyPair()
-
-                val encodedKey = keyPair.privateKey.keyToBase64()
-                return@decrypt callback(null, encodedKey)
-            } catch (exception: Exception) {
-                return@decrypt callback(err, "")
-            }
-        })
-
-
-    }
-
     companion object {
         const val UPORT_ROOT_DERIVATION_PATH: String = "m/7696500'/0'/0'/0'"
     }
