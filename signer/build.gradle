@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+
 android {
     compileSdkVersion compile_sdk_version
     buildToolsVersion build_tools_version
@@ -34,7 +36,6 @@ android {
 dependencies {
     implementation "com.android.support:appcompat-v7:$support_lib_version"
 
-//    implementation "com.madgag.spongycastle:prov:$spongy_castle_version"
     api "com.github.walleth:kethereum:0.37"
 
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
