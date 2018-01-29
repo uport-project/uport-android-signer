@@ -1,0 +1,305 @@
+package com.uport.sdk.signer
+
+import android.support.test.rule.ActivityTestRule
+import android.util.Base64
+import com.uport.sdk.signer.encryption.KeyProtection
+import org.junit.Assert.*
+import org.junit.Rule
+import org.junit.Test
+import org.kethereum.crypto.ECKeyPair
+import org.kethereum.crypto.signMessage
+import org.kethereum.extensions.hexToBigInteger
+import org.spongycastle.util.encoders.Hex
+import org.walleth.khex.hexToByteArray
+import org.walleth.khex.toNoPrefixHexString
+import java.math.BigInteger
+import java.util.*
+import java.util.concurrent.CountDownLatch
+
+class SignerTests {
+
+    @Rule
+    @JvmField
+    val mActivityRule: ActivityTestRule<TestDummyActivity> = ActivityTestRule(TestDummyActivity::class.java)
+
+    @Test
+    fun testKeyCreationAndUsage() {
+        val activity = mActivityRule.activity
+        val latch = CountDownLatch(1)
+
+        val signer = UportSigner()
+        signer.createKey(activity, KeyProtection.Level.SIMPLE, { err, address, pubKey ->
+
+            assertNull(err)
+
+            assertTrue(address.matches("^0x[0-9a-fA-F]+$".toRegex()))
+
+            val pubKeyBytes = Base64.decode(pubKey, Base64.DEFAULT)
+            assertEquals(65, pubKeyBytes.size)
+
+            UportSigner().signJwtBundle(activity, address, Base64.encodeToString("hello".toByteArray(), Base64.DEFAULT), "", { _, _ ->
+                latch.countDown()
+            })
+        })
+
+        latch.await()
+    }
+
+    @Test
+    fun testKeyImportAndUsage() {
+        val activity = mActivityRule.activity
+        val privKeyBytes = "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38".hexToByteArray()
+        val latch = CountDownLatch(1)
+
+        val signer = UportSigner()
+        signer.saveKey(activity, KeyProtection.Level.SIMPLE, privKeyBytes, { err, address, pubKey ->
+
+            assertNull(err)
+
+            assertTrue(address.matches("^0x[0-9a-fA-F]+$".toRegex()))
+
+            val pubKeyBytes = Base64.decode(pubKey, Base64.DEFAULT)
+            assertEquals(65, pubKeyBytes.size)
+
+            UportSigner().signJwtBundle(activity, address, Base64.encodeToString("hello".toByteArray(), Base64.DEFAULT), "", { _, _ ->
+                latch.countDown()
+            })
+        })
+
+        latch.await()
+    }
+
+    @Test
+    fun testKeyImportAndUsageMulti() {
+        val activity = mActivityRule.activity
+        val privKeyBytes = "278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f".hexToByteArray()
+
+        val refData1 = "ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlV6STFOa3NpZlEuZXlKcGMzTWlPaUl6TkhkcWMzaDNkbVIxWVc1dk4wNUdRemgxYWs1S2JrWnFZbUZqWjFsbFYwRTRiU0lzSW1saGRDSTZNVFE0TlRNeU1URXpNeXdpWTJ4aGFXMXpJanA3SW01aGJXVWlPaUpDYjJJaWZTd2laWGh3SWpveE5EZzFOREEzTlRNemZR"
+        val refSignature1 = "sg1oJ7J_f2pWaX2JwqzA61oWMUK5v0LYVxUp3PvG7Y25CVYWPyQ6UhA7U9d4w3Ny74k7ryMaUz7En5RSL4pyXg"
+
+        val refData2 = "ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlV6STFOa3NpZlEuZXlKcGMzTWlPaUl6TkhkcWMzaDNkbVIxWVc1dk4wNUdRemgxYWs1S2JrWnFZbUZqWjFsbFYwRTRiU0lzSW1saGRDSTZNVFE0TlRNeU1URXpNekF3TUN3aVkyeGhhVzF6SWpwN0ltNWhiV1VpT2lKQ2IySWlmU3dpWlhod0lqb3hORGcxTkRBM05UTXpNREF3ZlE="
+        val refSignature2 = "XJlwY1KrGRa53oHjz6vjsJadn-Er1ZW6WvLg1KiBQonV9vwqan-hAvn4tNFh7qyZMxxa3xyO7wN7GNuz6_UJ5Q"
+
+        val refData3 = "ZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlV6STFOa3NpZlEuZXlKcGMzTWlPaUl6TkhkcWMzaDNkbVIxWVc1dk4wNUdRemgxYWs1S2JrWnFZbUZqWjFsbFYwRTRiU0lzSW1saGRDSTZNVFE0TlRNeU1URXpNeXdpWTJ4aGFXMXpJanA3SW01aGJXVWlPaUpDYjJJaWZTd2laWGh3SWpveU5EZzFNekl4TVRNemZR"
+        val refSignature3 = "yHkI8fY42iquI-3CSM0k75cJQ4X1DoiGV436YgFQIhJUvjO17q01KhJv2jXviCQrstYe7MZpmJE4SxTvCoC1qQ"
+
+        val latch = CountDownLatch(3)
+
+        val signer = UportSigner()
+        signer.saveKey(activity, KeyProtection.Level.SIMPLE, privKeyBytes, { err, address, _ ->
+
+            assertNull(err)
+
+            assertEquals("0xf3beac30c498d9e26865f34fcaa57dbb935b0d74", address)
+
+            UportSigner().signJwtBundle(activity, address, refData1, "", { signerErr, sig ->
+                assertNull(signerErr)
+                assertEquals(refSignature1, sig)
+                latch.countDown()
+            })
+
+            UportSigner().signJwtBundle(activity, address, refData2, "", { signerErr, sig ->
+                assertNull(signerErr)
+                assertEquals(refSignature2, sig)
+                latch.countDown()
+            })
+
+            UportSigner().signJwtBundle(activity, address, refData3, "", { signerErr, sig ->
+                assertNull(signerErr)
+                assertEquals(refSignature3, sig)
+                latch.countDown()
+            })
+
+        })
+
+        latch.await()
+    }
+
+    @Test
+    fun testPublicKey1() {
+        val referencePrivateKey = "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38"
+        val referencePublicKey = "04bf42759e6d2a684ef64a8210c55bf2308e4101f78959ffa335ff045ef1e4252b1c09710281f8971b39efed7bfb61ae381ed73b9faa5a96f17e00c1a4c32796b1"
+        val keyPair = ECKeyPair.create(Hex.decode(referencePrivateKey))
+        val pubKeyBytes = keyPair.getUncompressedPublicKeyWithPrefix()
+        val pubKeyHex = pubKeyBytes.toNoPrefixHexString()
+
+        assertEquals(referencePublicKey, pubKeyHex)
+    }
+
+
+    @Test
+    fun keyImportGeneratesProperPublicKeyAndAddress() {
+        val activity = mActivityRule.activity
+        val privKeyBytes = "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38".hexToByteArray()
+
+        val referencePublicKey = "BL9CdZ5tKmhO9kqCEMVb8jCOQQH3iVn/ozX/BF7x5CUrHAlxAoH4lxs57+17+2GuOB7XO5+qWpbxfgDBpMMnlrE="
+        val referenceAddress = "0x45c4EBd7Ffb86891BA6f9F68452F9F0815AAcD8b".toLowerCase()
+
+        val latch = CountDownLatch(1)
+
+        val signer = UportSigner()
+        signer.saveKey(activity, KeyProtection.Level.SIMPLE, privKeyBytes, { err, address, pubKey ->
+
+            assertNull(err)
+
+            assertEquals(referenceAddress, address)
+
+            assertEquals(referencePublicKey, pubKey)
+
+            latch.countDown()
+        })
+
+        latch.await()
+    }
+
+    @Test
+    fun testPublicKey2() {
+        val keypair = ECKeyPair.create(Hex.decode("278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f"))
+        val pubKeyBytes = keypair.getUncompressedPublicKeyWithPrefix()
+        val pubKeyEnc = Hex.toHexString(pubKeyBytes)
+        assertEquals("04fdd57adec3d438ea237fe46b33ee1e016eda6b585c3e27ea66686c2ea535847946393f8145252eea68afe67e287b3ed9b31685ba6c3b00060a73b9b1242d68f7", pubKeyEnc)
+    }
+
+    @Test
+    fun testJwtJose() {
+        val referencePrivateKey = "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38"
+        val referenceSignature = "N0vw5-xCGN8XN4Q7E8XppJJi0Dch92MhMExZBqPLxJKhYYWxrb2HoY1FQ1YGC011DG1YzzdsbV1_0nIQ0ONKOg"
+
+        val msg = "Hello, world!".toByteArray()
+
+        val keyPair = ECKeyPair.create(Hex.decode(referencePrivateKey))
+
+        val sigData = UportSigner().signJwt(msg, keyPair).getJoseEncoded()
+
+        assertEquals(referenceSignature, sigData)
+    }
+
+    @Test
+    fun testJwtDer() {
+        val referencePrivateKey = "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38"
+        val referenceSignature = "30450220374bf0e7ec4218df1737843b13c5e9a49262d03721f76321304c5906a3cbc492022100a16185b1adbd87a18d454356060b4d750c6d58cf376c6d5d7fd27210d0e34a3a"
+
+        val msg = "Hello, world!".toByteArray()
+
+        val keyPair = ECKeyPair.create(Hex.decode(referencePrivateKey))
+
+        val sigData = UportSigner().signJwt(msg, keyPair).getDerEncoded()
+
+        assertEquals(referenceSignature, sigData)
+    }
+
+    @Test
+    fun testJwtComponents() {
+        val referencePrivateKey = Hex.decode("5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38")
+
+        val referenceR = "374bf0e7ec4218df1737843b13c5e9a49262d03721f76321304c5906a3cbc492".hexToBigInteger()
+        val referenceS = "a16185b1adbd87a18d454356060b4d750c6d58cf376c6d5d7fd27210d0e34a3a".hexToBigInteger()
+
+        val msg = "Hello, world!".toByteArray()
+
+        val keyPair = ECKeyPair.create(referencePrivateKey)
+
+        val sigData = UportSigner().signJwt(msg, keyPair)
+
+        assertEquals(referenceR, sigData.r)
+        assertEquals(referenceS, sigData.s)
+    }
+
+    @Test
+    fun testSignTxComponents() {
+        val referencePrivKeyBytes = Base64.decode("NobiRYkMf5l3Zrc6Idjln2OF4SCIMa84YldHkMvD0Vg=", Base64.DEFAULT)
+
+        val referenceR = BigInteger(1, Base64.decode("gJ47XvJfSjsDkTni+3D3C2NuuonHejsB4MccGjbYQSY=", Base64.DEFAULT))
+        val referenceS = BigInteger(1, Base64.decode("OFJN/NPkEstrw39FlLutEEtnZLsUxk5CxplzAQbRiFo=", Base64.DEFAULT))
+
+        val rawTransaction = Base64.decode("84CFC6Q7dACDL+/YlJ4gaMziLeTh6A8Vy3HvQ1ogo7N8iA3gtrOnZAAAiQq83vASNFZ4kA==", Base64.DEFAULT)
+
+        val keyPair = ECKeyPair.create(referencePrivKeyBytes)
+
+        val sigData = signMessage(rawTransaction, keyPair)
+
+        val obtainedR = sigData.r
+        val obtainedS = sigData.s
+
+        assertEquals(referenceR, obtainedR)
+        assertEquals(referenceS, obtainedS)
+    }
+
+    @Test
+    fun testEncStorage() {
+        val signer = UportSigner()
+        var latch = CountDownLatch(1)
+
+        val label = "whatever"
+        val payload = "foobar"
+
+        signer.storeEncryptedPayload(mActivityRule.activity,
+                KeyProtection.Level.SIMPLE,
+                label,
+                payload.toByteArray(),
+                { err, result ->
+                    assertNull(err)
+                    assertTrue(result)
+                    latch.countDown()
+                }
+        )
+        latch.await()
+
+        latch = CountDownLatch(1)
+        signer.loadEncryptedPayload(mActivityRule.activity,
+                label,
+                "just decrypt it already",
+                { err, resultBytes ->
+                    assertNull(err)
+                    assertEquals(String(resultBytes), payload)
+                    latch.countDown()
+                }
+        )
+        latch.await()
+    }
+
+    @Test
+    fun testAllAddresses() {
+        val signer = UportSigner()
+
+        val rand = Random()
+        val privKeys = LinkedList<ByteArray>()
+        val addresses = LinkedList<String>()
+
+        val iter = 10
+        val createLatch = CountDownLatch(iter)
+
+        //create and store a bunch of addresses
+        for (i in 0..iter) {
+            val pk = ByteArray(32)
+            rand.nextBytes(pk)
+            privKeys.push(pk)
+
+            signer.saveKey(mActivityRule.activity,
+                    KeyProtection.Level.SIMPLE,
+                    pk, { err, address, _ ->
+                assertNull(err)
+                addresses.push(address)
+                createLatch.countDown()
+            }
+            )
+        }
+
+        createLatch.await()
+
+        //check if the addresses are read back successfully from storage
+        val readLatch = CountDownLatch(1)
+        val storedAddressList = LinkedList<String>()
+        signer.allAddresses(mActivityRule.activity,
+                { list ->
+                    storedAddressList.addAll(list)
+                    readLatch.countDown()
+                }
+        )
+        readLatch.await()
+
+        assertTrue(storedAddressList.containsAll(addresses))
+
+    }
+}
+
