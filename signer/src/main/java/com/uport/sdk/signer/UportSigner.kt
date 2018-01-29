@@ -13,12 +13,18 @@ import org.kethereum.crypto.signMessage
 import org.kethereum.crypto.signMessageHash
 import org.kethereum.hashes.sha256
 import org.kethereum.model.SignatureData
+import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.walleth.khex.prepend0xPrefix
 import java.math.BigInteger
 import java.security.InvalidKeyException
 import java.security.KeyException
+import java.security.Security
 
 open class UportSigner {
+
+    init {
+        Security.addProvider(BouncyCastleProvider())
+    }
 
     /**
      * checks if the device is secured with a lockscreen

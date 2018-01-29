@@ -38,34 +38,39 @@ class UportHDSigner : UportSigner() {
 
     fun importHDSeed(context: Context, level: KeyProtection.Level, phrase: String, callback: (err: Exception?, address: String, pubKey: String) -> Unit) {
 
-        val seedBuffer = Mnemonic.mnemonicToSeed(phrase)
-        val entropyBuffer = Mnemonic.mnemonicToEntropy(phrase)
+        try {
+            val seedBuffer = Mnemonic.mnemonicToSeed(phrase)
 
-        val extendedRootKey = generateKey(seedBuffer, UPORT_ROOT_DERIVATION_PATH)
+            val entropyBuffer = Mnemonic.mnemonicToEntropy(phrase)
 
-        val keyPair = extendedRootKey.getKeyPair()
+            val extendedRootKey = generateKey(seedBuffer, UPORT_ROOT_DERIVATION_PATH)
 
-        val publicKeyBytes = keyPair.getUncompressedPublicKeyWithPrefix()
-        val publicKeyString = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
-        val address: String = Keys.getAddress(keyPair).prepend0xPrefix()
+            val keyPair = extendedRootKey.getKeyPair()
 
-        val label = asSeedLabel(address)
+            val publicKeyBytes = keyPair.getUncompressedPublicKeyWithPrefix()
+            val publicKeyString = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
+            val address: String = Keys.getAddress(keyPair).prepend0xPrefix()
 
-        storeEncryptedPayload(context,
-                level,
-                label,
-                entropyBuffer,
-                { err, _ ->
+            val label = asSeedLabel(address)
 
-                    //empty memory
-                    entropyBuffer.fill(0)
+            storeEncryptedPayload(context,
+                    level,
+                    label,
+                    entropyBuffer,
+                    { err, _ ->
 
-                    if (err != null) {
-                        return@storeEncryptedPayload callback(err, "", "")
-                    }
+                        //empty memory
+                        entropyBuffer.fill(0)
 
-                    return@storeEncryptedPayload callback(null, address, publicKeyString)
-                })
+                        if (err != null) {
+                            return@storeEncryptedPayload callback(err, "", "")
+                        }
+
+                        return@storeEncryptedPayload callback(null, address, publicKeyString)
+                    })
+        } catch (ex: Exception) {
+            return callback(ex, "", "")
+        }
     }
 
 

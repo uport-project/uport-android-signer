@@ -4,14 +4,11 @@ import android.support.test.rule.ActivityTestRule
 import android.util.Base64
 import com.uport.sdk.signer.encryption.KeyProtection
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.kethereum.bip32.generateKey
 import org.kethereum.bip39.Mnemonic
 import org.kethereum.extensions.hexToBigInteger
-import org.spongycastle.jce.provider.BouncyCastleProvider
-import java.security.Security
 import java.util.concurrent.CountDownLatch
 
 class HDSignerTests {
@@ -19,12 +16,6 @@ class HDSignerTests {
     @Rule
     @JvmField
     val mActivityRule: ActivityTestRule<TestDummyActivity> = ActivityTestRule(TestDummyActivity::class.java)
-
-    @Before
-    fun setupProviders() {
-        //FIXME: temporary workaround while issue #20 of kethereum is still open
-        Security.addProvider(BouncyCastleProvider())
-    }
 
     @Test
     fun testSeedCreationAndUsage() {
