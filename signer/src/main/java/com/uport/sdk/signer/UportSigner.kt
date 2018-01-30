@@ -9,6 +9,7 @@ import com.uport.sdk.signer.encryption.KeyProtectionFactory
 import com.uport.sdk.signer.encryption.SimpleAsymmetricProtection
 import org.kethereum.crypto.ECKeyPair
 import org.kethereum.crypto.Keys
+import org.kethereum.crypto.Keys.PUBLIC_KEY_SIZE
 import org.kethereum.crypto.signMessage
 import org.kethereum.crypto.signMessageHash
 import org.kethereum.hashes.sha256
@@ -20,6 +21,7 @@ import java.security.InvalidKeyException
 import java.security.KeyException
 import java.security.Security
 
+@Suppress("unused")
 open class UportSigner {
 
     init {
@@ -159,7 +161,7 @@ open class UportSigner {
      * Fetches the encryption combo for a particular label(address)
      * The encryption combo is the ciphertext along with the class needed to decrypt it
      */
-    internal fun getEncryptionForLabel(context: Context, label: String): EncryptionCombo {
+    fun getEncryptionForLabel(context: Context, label: String): EncryptionCombo {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
 
         return try {
@@ -294,7 +296,7 @@ open class UportSigner {
      * Payloads can be stored at different levels of encryption (see [storeEncryptedPayload])
      * In case the payload in question needs user presence to decrypt,
      * the [context] should be an instance of AppcompatActivity and it will
-     * show the necessary UI (fingerprint dialog or lockscreen) with a [prompt]
+     * show the necessary UI (fingerprint dialog or lock-screen) with a [prompt]
      *
      * This method calls back with the decrypted [ByteArray] on success
      * or a non-null exception if something goes wrong
@@ -324,7 +326,7 @@ open class UportSigner {
 
     companion object {
 
-        internal val ETH_ENCRYPTED_STORAGE = "eth_signer_store"
+        internal const val ETH_ENCRYPTED_STORAGE = "eth_signer_store"
 
         private const val ADDRESS_PREFIX = "address-"
         internal const val SEED_PREFIX = "seed-"
@@ -343,8 +345,6 @@ open class UportSigner {
         const val ERR_AUTH_CANCELED = "E_AUTH_CANCELED"
         const val ERR_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST"
 
-        const val PRIVATE_KEY_SIZE = 32
-        const val PUBLIC_KEY_SIZE = 64
         const val UNCOMPRESSED_PUBLIC_KEY_SIZE = PUBLIC_KEY_SIZE + 1
 
         data class EncryptionCombo(val keyProtection: KeyProtection, val encPayload: String, val err: Exception?)

@@ -2,6 +2,7 @@ package com.uport.sdk.signer
 
 import android.util.Base64
 import org.kethereum.crypto.ECKeyPair
+import org.kethereum.crypto.Keys.PRIVATE_KEY_SIZE
 import org.kethereum.extensions.toBytesPadded
 import org.kethereum.model.SignatureData
 import org.spongycastle.asn1.ASN1EncodableVector
@@ -12,13 +13,16 @@ import org.walleth.khex.toNoPrefixHexString
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 
+
+const val SIG_COMPONENT_SIZE = PRIVATE_KEY_SIZE
+
 /**
  * Returns the JOSE encoding of the standard signature components (joined by empty string)
  */
 fun SignatureData.getJoseEncoded(): String {
     val bos = ByteArrayOutputStream()
-    bos.write(this.r.toBytesPadded(32))
-    bos.write(this.s.toBytesPadded(32))
+    bos.write(this.r.toBytesPadded(SIG_COMPONENT_SIZE))
+    bos.write(this.s.toBytesPadded(SIG_COMPONENT_SIZE))
     return Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
 }
 
@@ -63,5 +67,5 @@ internal fun ECKeyPair.getUncompressedPublicKeyWithPrefix(): ByteArray {
     return pubBytes
 }
 
-fun BigInteger.keyToBase64(keySize: Int = 32): String =
+fun BigInteger.keyToBase64(keySize: Int = PRIVATE_KEY_SIZE): String =
         Base64.encodeToString(this.toBytesPadded(keySize), Base64.DEFAULT or Base64.NO_WRAP)

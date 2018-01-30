@@ -12,6 +12,7 @@ import org.kethereum.model.SignatureData
 import org.walleth.khex.prepend0xPrefix
 import java.security.SecureRandom
 
+@Suppress("unused")
 class UportHDSigner : UportSigner() {
 
     fun hasSeed(context: Context): Boolean {
