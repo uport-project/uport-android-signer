@@ -213,6 +213,11 @@ class UportHDSigner : UportSigner() {
         })
     }
 
+    /**
+     * Verifies if a given phrase is a valid mnemonic phrase usable in seed generation
+     */
+    fun validateMnemonic(phrase: String): Boolean = Mnemonic.validateMnemonic(phrase)
+
     companion object {
         const val UPORT_ROOT_DERIVATION_PATH: String = "m/7696500'/0'/0'/0'"
     }
