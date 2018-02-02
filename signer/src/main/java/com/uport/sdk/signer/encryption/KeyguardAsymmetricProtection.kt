@@ -74,7 +74,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
     }
 
     companion object {
-        private val SESSION_TIMEOUT_SECONDS: Int = 30 //seconds
+        private const val SESSION_TIMEOUT_SECONDS: Int = 30 //seconds
     }
 
 }

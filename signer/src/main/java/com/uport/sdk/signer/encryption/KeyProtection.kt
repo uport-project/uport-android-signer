@@ -27,9 +27,24 @@ import javax.security.cert.CertificateException
 abstract class KeyProtection {
 
     enum class Level {
+        /**
+         * Requires user authentication within a 30 second time window
+         */
         SINGLE_PROMPT,
+
+        /**
+         * Requires user authentication using fingerprint or Lockscreen for every use of the key
+         */
         PROMPT,
+
+        /**
+         * Uses AndroidKeyStore encryption, without user presence requirement
+         */
         SIMPLE,
+
+        /**
+         * unused yet - defaults to [SIMPLE]
+         */
         CLOUD
     }
 
