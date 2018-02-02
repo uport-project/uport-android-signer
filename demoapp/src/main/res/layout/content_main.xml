@@ -9,14 +9,24 @@
     tools:showIn="@layout/activity_main">
 
     <Button
-        android:id="@+id/mnemonicGo"
+        android:id="@+id/generateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Generate new"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/importButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Generate"
+        android:text="Import"
+        app:layout_constraintBottom_toBottomOf="@+id/mnemonicPhraseField"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/mnemonicPhraseField" />
 
     <AutoCompleteTextView
         android:id="@+id/mnemonicPhraseField"
@@ -24,16 +34,16 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:hint="mnemonic phrase"
         android:inputType="textNoSuggestions"
         android:lines="7"
         android:maxLines="10"
         android:minLines="5"
         android:singleLine="false"
-        app:layout_constraintEnd_toStartOf="@+id/mnemonicGo"
+        app:layout_constraintEnd_toStartOf="@+id/importButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/generateButton"
         tools:text="mnemonic phrase" />
 
     <TextView
@@ -73,5 +83,6 @@
         app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="@+id/mnemonicPhraseField"
         app:layout_constraintTop_toBottomOf="@+id/publicKeyField" />
+
 
 </android.support.constraint.ConstraintLayout>
