@@ -24,7 +24,7 @@ android {
 
 configurations.all {
     resolutionStrategy.dependencySubstitution {
-        substitute module("com.github.uport-project:uport-android-signer:+") with project(":signer")
+        substitute module("com.github.uport-project:uport-android-signer:$uport_signer_version") with project(":signer")
     }
 }
 
@@ -33,9 +33,10 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support_lib_version"
     implementation "com.android.support:design:$support_lib_version"
 
-    implementation "com.github.uport-project:uport-android-signer:0.0.1"
+    implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_version"

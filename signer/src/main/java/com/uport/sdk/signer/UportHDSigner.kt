@@ -218,6 +218,19 @@ class UportHDSigner : UportSigner() {
      */
     fun validateMnemonic(phrase: String): Boolean = Mnemonic.validateMnemonic(phrase)
 
+    /**
+     * Returns a list of addresses representing the uport roots used as handles for seeds
+     */
+    fun allHDRoots(context: Context): List<String> {
+
+        val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
+        //list all stored keys, keep a list off what looks like uport root addresses
+        return prefs.all.keys
+                .filter({ label -> label.startsWith(SEED_PREFIX) })
+                .filter({ hasCorrespondingLevelKey(prefs, it) })
+                .map { label: String -> label.substring(SEED_PREFIX.length) }
+    }
+
     companion object {
         const val UPORT_ROOT_DERIVATION_PATH: String = "m/7696500'/0'/0'/0'"
     }

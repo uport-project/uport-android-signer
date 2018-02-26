@@ -9,6 +9,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".CreateKeysActivity"
+            android:label="@string/title_activity_create_keys"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".UseKeysActivity"
+            android:label="@string/title_activity_use_keys"
+            />
+        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
@@ -18,7 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
