@@ -43,7 +43,7 @@ class SignatureTests {
 
                 UportSigner().signJwtBundle(context, address, refJwtMessage, "", { signerErr, sig ->
                     assertNull(signerErr)
-                    assertEquals(refJwtSignature, sig)
+                    assertEquals(refJwtSignature, sig.getJoseEncoded())
                     latch.countDown()
                 })
 

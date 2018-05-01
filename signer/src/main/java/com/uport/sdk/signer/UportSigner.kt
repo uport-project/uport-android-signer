@@ -205,17 +205,17 @@ open class UportSigner {
      * @param callback (error, signature) called after the transaction has been signed successfully or
      * with an error and empty data when it fails
      */
-    fun signJwtBundle(context: Context, address: String, data: String, prompt: String, callback: (err: Exception?, signature: String) -> Unit) {
+    fun signJwtBundle(context: Context, address: String, data: String, prompt: String, callback: (err: Exception?, sigData: SignatureData) -> Unit) {
 
         val (encryptionLayer, encryptedPrivateKey, storageError) = getEncryptionForLabel(context, asAddressLabel(address))
 
         if (storageError != null) {
-            return callback(storageError, "")
+            return callback(storageError, SignatureData())
         }
 
         encryptionLayer.decrypt(context, prompt, encryptedPrivateKey, { err, privateKey ->
             if (err != null) {
-                return@decrypt callback(err, "")
+                return@decrypt callback(err, SignatureData())
             }
 
             try {
@@ -224,10 +224,9 @@ open class UportSigner {
                 val sig = signJwt(payloadBytes, keyPair)
                 privateKey.fill(0)
 
-                val signatureOut = sig.getJoseEncoded()
-                return@decrypt callback(null, signatureOut)
+                return@decrypt callback(null, sig)
             } catch (exception: Exception) {
-                return@decrypt callback(err, "")
+                return@decrypt callback(err, SignatureData())
             }
         })
     }

@@ -36,8 +36,9 @@ dependencies {
     implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    testImplementation "junit:junit:$junit_version"
+    testImplementation("junit:junit:$junit_version")
+            { exclude group: 'com.squareup.okio', module: 'okio' }
+
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_version"
 }
