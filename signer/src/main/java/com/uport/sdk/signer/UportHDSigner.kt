@@ -111,17 +111,17 @@ class UportHDSigner : UportSigner() {
 
     }
 
-    fun signJwtBundle(context: Context, rootAddress: String, derivationPath: String, data: String, prompt: String, callback: (err: Exception?, signature: String) -> Unit) {
+    fun signJwtBundle(context: Context, rootAddress: String, derivationPath: String, data: String, prompt: String, callback: (err: Exception?, sigData: SignatureData) -> Unit) {
 
         val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
 
         if (storageError != null) {
-            return callback(storageError, "")
+            return callback(storageError, SignatureData())
         }
 
         encryptionLayer.decrypt(context, prompt, encryptedEntropy, { err, entropyBuff ->
             if (err != null) {
-                return@decrypt callback(err, "")
+                return@decrypt callback(err, SignatureData())
             }
 
             try {
@@ -134,10 +134,9 @@ class UportHDSigner : UportSigner() {
                 val payloadBytes = Base64.decode(data, Base64.DEFAULT)
                 val sig = signJwt(payloadBytes, keyPair)
 
-                val signatureOut = sig.getJoseEncoded()
-                return@decrypt callback(null, signatureOut)
+                return@decrypt callback(null, sig)
             } catch (exception: Exception) {
-                return@decrypt callback(err, "")
+                return@decrypt callback(err, SignatureData())
             }
         })
     }
