@@ -28,7 +28,7 @@ in your app `build.gradle`:
 ```groovy
 dependencies {
     ...
-    implementation "com.github.uport-project:uport-android-signer:0.0.1"
+    implementation "com.github.uport-project:uport-android-signer:0.1.1"
 }
 ```
 
@@ -69,11 +69,21 @@ UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE, { err, rootAd
 You can also import bip39 mnemonic phrases:
 
 ```kotlin
+
+//bip39 mnemonic phrase:
+val phrase = "vessel ladder alter ... glass valve picture"
+
 UportHDSigner().importHDSeed(activity, KeyProtection.Level.SIMPLE, phrase, { err, rootAddress, publicKey ->
-                //seed has been imported and 
-                // * the handle is `rootAddress`
-                // * the corresponding publicKey in base64 is `publicKey`
-                // * if there was an error, those are blank and the err object is non null 
+
+                if (err != null) {
+                    //handle error
+                } else {
+                    assertEquals("0x794a...e96ac8", rootAddress)
+                    //seed has been imported and 
+                    // * the handle is `rootAddress`
+                    // * the corresponding publicKey in base64 is `publicKey`
+                }
+                 
             })
 ```
 
