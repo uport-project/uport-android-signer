@@ -195,8 +195,8 @@ open class UportSigner {
      * this method will launch the decryption UI and schedule a callback with the signature
      * after the decryption takes place or a non-null error in case something goes wrong (or user cancels)
      *
-     * The decryption UI can be a device lockscreen or fingerprint-dialog depending on the level of encryption
-     * requested at key creation.
+     * The decryption UI can be a device lockscreen or fingerprint-dialog depending on the
+     * [KeyProtection.Level] of encryption requested at key creation.
      *
      * @param context The android activity from which the signature is requested or application context;
      * @param address the 0x ETH address corresponding to the desired key
