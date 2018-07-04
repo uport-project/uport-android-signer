@@ -1,6 +1,7 @@
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
+import android.os.Build
 
 object KeyProtectionFactory {
 
@@ -10,15 +11,23 @@ object KeyProtectionFactory {
         val store = when (level) {
 
             KeyProtection.Level.SINGLE_PROMPT -> {
-                KeyguardAsymmetricProtection()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    KeyguardAsymmetricProtection()
+                } else {
+                    SimpleAsymmetricProtection()
+                }
             }
 
             KeyProtection.Level.PROMPT -> {
 
-                if (KeyProtection.hasSetupFingerprint(context)) {
-                    FingerprintAsymmetricProtection()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (KeyProtection.hasSetupFingerprint(context)) {
+                        FingerprintAsymmetricProtection()
+                    } else {
+                        KeyguardAsymmetricProtection(1)
+                    }
                 } else {
-                    KeyguardAsymmetricProtection(1)
+                    SimpleAsymmetricProtection()
                 }
             }
 

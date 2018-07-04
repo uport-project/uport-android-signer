@@ -3,15 +3,31 @@ package com.uport.sdk.signer.encryption
 import android.app.KeyguardManager
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
+import android.os.Build
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
 import com.uport.sdk.signer.packCiphertext
 import com.uport.sdk.signer.unpackCiphertext
 import java.io.IOException
-import java.security.*
+import java.math.BigInteger
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
+import java.security.KeyFactory
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.NoSuchProviderException
+import java.security.PrivateKey
+import java.security.UnrecoverableKeyException
 import java.security.spec.MGF1ParameterSpec
+import java.security.spec.RSAKeyGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
+import java.util.*
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.Cipher.DECRYPT_MODE
@@ -19,7 +35,9 @@ import javax.crypto.Cipher.ENCRYPT_MODE
 import javax.crypto.IllegalBlockSizeException
 import javax.crypto.spec.OAEPParameterSpec
 import javax.crypto.spec.PSource
+import javax.security.auth.x500.X500Principal
 import javax.security.cert.CertificateException
+
 
 /**
  * Describes the functionality of encryption layer
@@ -58,24 +76,47 @@ abstract class KeyProtection {
             NoSuchProviderException::class,
             NoSuchAlgorithmException::class,
             InvalidAlgorithmParameterException::class)
-    internal fun generateKey(keyAlias: String, requiresAuth: Boolean = false, sessionTimeout: Int = -1) {
+    internal fun generateKey(context: Context, keyAlias: String, requiresAuth: Boolean = false, sessionTimeout: Int = -1) {
 
         val keyStore = getKeyStore()
 
         val publicKey = keyStore.getCertificate(keyAlias)?.publicKey
 
         if (publicKey == null) {
-            val keyPairGenerator = KeyPairGenerator.getInstance(
-                    KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEYSTORE_PROVIDER)
-            keyPairGenerator.initialize(
-                    KeyGenParameterSpec.Builder(
-                            keyAlias,
-                            KeyProperties.PURPOSE_DECRYPT)
-                            .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-                            .setUserAuthenticationRequired(requiresAuth)
-                            .setUserAuthenticationValidityDurationSeconds(sessionTimeout)
-                            .build())
+
+            val spec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_DECRYPT)
+                        .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
+                        .setUserAuthenticationRequired(requiresAuth)
+                        .setUserAuthenticationValidityDurationSeconds(sessionTimeout)
+                        .build()
+            } else {
+                val cal = Calendar.getInstance()
+                val startDate: Date = cal.time
+                cal.add(Calendar.YEAR, 100)
+                val endDate: Date = cal.time
+
+                val specBuilder = KeyPairGeneratorSpec.Builder(context)
+                        .setAlias(keyAlias)
+                        .setSubject(X500Principal("CN=$keyAlias"))
+                        .setSerialNumber(BigInteger.ONE)
+                        .setStartDate(startDate)
+                        .setEndDate(endDate)
+                // Only API levels 19 and above allow specifying RSA key parameters.
+                if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+                    val rsaSpec = RSAKeyGenParameterSpec(KEY_SIZE, RSAKeyGenParameterSpec.F4)
+                    specBuilder.setAlgorithmParameterSpec(rsaSpec)
+                    specBuilder.setKeySize(KEY_SIZE)
+                }
+                if (requiresAuth) {
+                    specBuilder.setEncryptionRequired()
+                }
+                specBuilder.build()
+            }
+
+            val keyPairGenerator = KeyPairGenerator.getInstance("RSA", ANDROID_KEYSTORE_PROVIDER)
+            keyPairGenerator.initialize(spec)
             keyPairGenerator.generateKeyPair()
         }
     }
@@ -98,7 +139,13 @@ abstract class KeyProtection {
 
             val privateKey = keyStore.getKey(keyAlias, null) as PrivateKey
 
-            cipher.init(mode, privateKey)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val spec = OAEPParameterSpec(
+                        "SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+                cipher.init(mode, privateKey, spec)
+            } else {
+                cipher.init(mode, privateKey)
+            }
 
         } else if (mode == ENCRYPT_MODE) {
 
@@ -108,10 +155,14 @@ abstract class KeyProtection {
             val unrestricted = KeyFactory.getInstance(publicKey.algorithm)
                     .generatePublic(X509EncodedKeySpec(publicKey.encoded))
 
-            val spec = OAEPParameterSpec(
-                    "SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val spec = OAEPParameterSpec(
+                        "SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+                cipher.init(mode, unrestricted, spec)
+            } else {
+                cipher.init(mode, unrestricted)
+            }
 
-            cipher.init(Cipher.ENCRYPT_MODE, unrestricted, spec)
         }
         return cipher
     }
@@ -135,7 +186,7 @@ abstract class KeyProtection {
 
         val encryptedBytes = cipher.doFinal(blob)
 
-        return encryptedBytes.packCiphertext()
+        return packCiphertext(encryptedBytes)
     }
 
     @Throws(IllegalBlockSizeException::class, BadPaddingException::class)
@@ -143,7 +194,7 @@ abstract class KeyProtection {
 
         val cipher = getCipher(DECRYPT_MODE, keyAlias)
 
-        val (_, encryptedBytes) = ciphertext.unpackCiphertext()
+        val (encryptedBytes) = unpackCiphertext(ciphertext)
 
         return cipher.doFinal(encryptedBytes)
     }
@@ -151,7 +202,12 @@ abstract class KeyProtection {
     companion object {
         const val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
 
-        const val ASYMMETRIC_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
+        val ASYMMETRIC_TRANSFORMATION =
+                if (Build.VERSION.SDK_INT >= VERSION_CODES.M)
+//                    "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
+                    "RSA/ECB/OAEPPadding"
+                else
+                    "RSA/ECB/PKCS1Padding"
 
         fun canUseKeychainAuthentication(context: Context): Boolean {
             val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -160,32 +216,42 @@ abstract class KeyProtection {
         }
 
         fun hasSetupFingerprint(context: Context): Boolean {
-            val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
-            try {
-                if (!mFingerprintManager.isHardwareDetected) {
-                    return false
-                } else if (!mFingerprintManager.hasEnrolledFingerprints()) {
-                    //TODO: prompt user to enroll fingerprints
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                try {
+                    if (!mFingerprintManager.isHardwareDetected) {
+                        return false
+                    } else if (!mFingerprintManager.hasEnrolledFingerprints()) {
+                        //TODO: prompt user to enroll fingerprints
+                        return false
+                    }
+                } catch (e: SecurityException) {
+                    // Should never be thrown since we have declared the USE_FINGERPRINT permission
+                    // in the manifest file
                     return false
                 }
-            } catch (e: SecurityException) {
-                // Should never be thrown since we have declared the USE_FINGERPRINT permission
-                // in the manifest file
+
+                return true
+            } else {
                 return false
             }
-
-            return true
         }
 
         fun hasFingerprintHardware(context: Context): Boolean {
-            val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
-            return try {
-                mFingerprintManager.isHardwareDetected
-            } catch (e: SecurityException) {
-                // Should never be thrown since we have declared the USE_FINGERPRINT permission
-                // in the manifest file
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                try {
+                    mFingerprintManager.isHardwareDetected
+                } catch (e: SecurityException) {
+                    // Should never be thrown since we have declared the USE_FINGERPRINT permission
+                    // in the manifest file
+                    false
+                }
+            } else {
                 false
             }
         }
+
+        const val KEY_SIZE = 2048
     }
 }

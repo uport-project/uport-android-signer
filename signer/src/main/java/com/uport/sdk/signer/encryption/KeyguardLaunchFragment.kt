@@ -28,7 +28,7 @@ class KeyguardLaunchFragment : Fragment() {
 
         val keyguardIntent = keyguardManager.createConfirmDeviceCredentialIntent("uPort", purpose)
 
-        startActivityForResult(keyguardIntent, Companion.REQUEST_CODE_KEYGUARD)
+        startActivityForResult(keyguardIntent, REQUEST_CODE_KEYGUARD)
     }
 
     private fun init(purpose: String, callback: KeyguardCallback) {
@@ -38,7 +38,7 @@ class KeyguardLaunchFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Companion.REQUEST_CODE_KEYGUARD) {
+        if (requestCode == REQUEST_CODE_KEYGUARD) {
             val result = resultCode == Activity.RESULT_OK
             callback.onKeyguardResult(result)
             dismiss()

@@ -21,7 +21,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
             return
         }
 
-        generateKey(alias, true, sessionTimeout)
+        generateKey(context, alias, true, sessionTimeout)
     }
 
     override

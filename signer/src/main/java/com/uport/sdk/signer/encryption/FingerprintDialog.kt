@@ -1,9 +1,11 @@
 package com.uport.sdk.signer.encryption
 
 import android.animation.Animator
+import android.annotation.TargetApi
 import android.app.DialogFragment
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
+import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.view.LayoutInflater
@@ -15,6 +17,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.uport.sdk.signer.R
 
+@TargetApi(Build.VERSION_CODES.M)
 class FingerprintDialog : DialogFragment() {
 
     private lateinit var fingerprintManager: FingerprintManager
@@ -79,7 +82,7 @@ class FingerprintDialog : DialogFragment() {
         textViewStatus = content.findViewById(R.id.textViewFingerprintStatus)
         cancelButton = content.findViewById(R.id.buttonFingerprintCancel)
 
-        cancelButton.setOnClickListener({ _ -> onCancelPressed() })
+        cancelButton.setOnClickListener { _ -> onCancelPressed() }
 
         return content
     }
