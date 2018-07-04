@@ -12,6 +12,7 @@ import org.spongycastle.asn1.DERSequence
 import org.walleth.khex.toNoPrefixHexString
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
+import java.util.*
 
 
 const val SIG_COMPONENT_SIZE = PRIVATE_KEY_SIZE
@@ -25,6 +26,12 @@ fun SignatureData.getJoseEncoded(): String {
     bos.write(this.s.toBytesPadded(SIG_COMPONENT_SIZE))
     return Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
 }
+
+fun String.decodeJose(recoveryParam: Byte = 27): SignatureData = listOf(this)
+        .map { Base64.decode(it, Base64.URL_SAFE) }
+        .map { Arrays.copyOfRange(it, 0, 32) to Arrays.copyOfRange(it, 32, 64) }
+        .map { SignatureData(BigInteger(1, it.first), BigInteger(1, it.second), recoveryParam) }
+        .first()
 
 /**
  * Returns the DER encoding of the standard signature components
@@ -41,25 +48,13 @@ fun SignatureData.getDerEncoded(): String {
 
 private const val DELIMITER = "]"
 
-fun ByteArray.packCiphertext(iv: ByteArray = kotlin.ByteArray(0)): String {
-    val encodedIV = Base64.encodeToString(iv, Base64.NO_WRAP)
-    val encodedEncData = Base64.encodeToString(this, Base64.NO_WRAP)
-    return "$encodedIV$DELIMITER$encodedEncData"
-}
+fun packCiphertext(vararg data: ByteArray): String =
+        data.joinToString(DELIMITER) { Base64.encodeToString(it, Base64.NO_WRAP) }
 
-fun Pair<ByteArray, ByteArray>.packCiphertext(): String {
-    val encodedIV = Base64.encodeToString(this.first, Base64.NO_WRAP)
-    val encodedEncData = Base64.encodeToString(this.second, Base64.NO_WRAP)
-    return "$encodedIV$DELIMITER$encodedEncData"
-}
-
-fun String.unpackCiphertext(): Pair<ByteArray, ByteArray> {
-    val components = this.split(DELIMITER)
-    val iv = Base64.decode(components[0], Base64.NO_WRAP)
-    val encryptedBytes = Base64.decode(components[1], Base64.NO_WRAP)
-    return Pair(iv, encryptedBytes)
-}
-
+fun unpackCiphertext(ciphertext: String): List<ByteArray> =
+        ciphertext
+                .split(DELIMITER)
+                .map { Base64.decode(it, Base64.NO_WRAP) }
 
 internal fun ECKeyPair.getUncompressedPublicKeyWithPrefix(): ByteArray {
     val pubBytes = this.publicKey.toBytesPadded(UportSigner.UNCOMPRESSED_PUBLIC_KEY_SIZE)

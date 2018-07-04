@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,7 +22,7 @@ class ProtectedSharedPreferencesTest {
     fun before() {
         context = InstrumentationRegistry.getContext()
         val basePrefs = context.getSharedPreferences("test_prefs", MODE_PRIVATE)
-        prefs = ProtectedSharedPreferences(basePrefs)
+        prefs = ProtectedSharedPreferences(context, basePrefs)
     }
 
     @Test
@@ -223,7 +226,7 @@ class ProtectedSharedPreferencesTest {
 
     @Test
     fun clearsUnencryptedData() {
-        val originalPrefs = InstrumentationRegistry.getContext().getSharedPreferences("dummy", MODE_PRIVATE)
+        val originalPrefs = context.getSharedPreferences("dummy", MODE_PRIVATE)
         originalPrefs.edit()
                 .putBoolean("b_bla", true)
                 .putString("s_bla", "hello")
@@ -233,7 +236,7 @@ class ProtectedSharedPreferencesTest {
                 .putStringSet("set_bla", setOf("hello", "world", "!"))
                 .apply()
 
-        val wrappedPrefs = ProtectedSharedPreferences(originalPrefs)
+        val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 
         setOf("b", "s", "f", "l", "i", "set").forEach {
             assertFalse(originalPrefs.contains("${it}_bla"))
@@ -244,9 +247,9 @@ class ProtectedSharedPreferencesTest {
 
     @Test
     fun clearsUnreadableDataOnContains() {
-        val originalPrefs = InstrumentationRegistry.getContext().getSharedPreferences("unreadable", MODE_PRIVATE)
+        val originalPrefs = context.getSharedPreferences("unreadable", MODE_PRIVATE)
 
-        val wrappedPrefs = ProtectedSharedPreferences(originalPrefs)
+        val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 
         //force some prefix collisions to make decryption fail
         originalPrefs.edit()
@@ -273,7 +276,7 @@ class ProtectedSharedPreferencesTest {
     fun returnsDefaultsWhenDecryptionFails() {
         val originalPrefs = InstrumentationRegistry.getContext().getSharedPreferences("defaultable", MODE_PRIVATE)
 
-        val wrappedPrefs = ProtectedSharedPreferences(originalPrefs)
+        val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 
         //force some prefix collisions to make decryption fail
         originalPrefs.edit()
