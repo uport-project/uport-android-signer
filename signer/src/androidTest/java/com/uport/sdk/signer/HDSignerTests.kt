@@ -1,16 +1,21 @@
 package com.uport.sdk.signer
 
 import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import com.uport.sdk.signer.encryption.KeyProtection
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.kethereum.bip32.generateKey
 import org.kethereum.bip39.Mnemonic
 import org.kethereum.extensions.hexToBigInteger
 import java.util.concurrent.CountDownLatch
 
+@RunWith(AndroidJUnit4::class)
 class HDSignerTests {
 
     @Rule
@@ -22,7 +27,7 @@ class HDSignerTests {
         val activity = mActivityRule.activity
         val latch = CountDownLatch(1)
 
-        UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE, { err, rootAddress, pubKey ->
+        UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE) { err, rootAddress, pubKey ->
 
             assertNull(err)
 
@@ -31,11 +36,11 @@ class HDSignerTests {
             val pubKeyBytes = Base64.decode(pubKey, Base64.DEFAULT)
             assertEquals(65, pubKeyBytes.size)
 
-            UportHDSigner().signJwtBundle(activity, rootAddress, "m/0'", Base64.encodeToString("hello".toByteArray(), Base64.DEFAULT), "", { error, _ ->
+            UportHDSigner().signJwtBundle(activity, rootAddress, "m/0'", Base64.encodeToString("hello".toByteArray(), Base64.DEFAULT), "") { error, _ ->
                 assertNull(error)
                 latch.countDown()
-            })
-        })
+            }
+        }
 
         latch.await()
     }
@@ -48,7 +53,7 @@ class HDSignerTests {
         val referencePublicKey = "BFcWkA3uvBb9nSyJmk5rJgx69UtlGN0zwDiNx5TcVmENEUcvF2V26GYP9/3HNE/7vquemm45hDYEqr1/Nph9aIE="
 
         val latch = CountDownLatch(1)
-        UportHDSigner().importHDSeed(activity, KeyProtection.Level.SIMPLE, referenceSeedPhrase, { err, address, pubKey ->
+        UportHDSigner().importHDSeed(activity, KeyProtection.Level.SIMPLE, referenceSeedPhrase) { err, address, pubKey ->
 
             assertNull(err)
 
@@ -57,7 +62,7 @@ class HDSignerTests {
             assertEquals(referencePublicKey, pubKey)
 
             latch.countDown()
-        })
+        }
 
         latch.await()
     }
@@ -92,19 +97,20 @@ class HDSignerTests {
         val activity = mActivityRule.activity
         val referenceSeedPhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
         val referenceRootAddress = "0x794adde0672914159c1b77dd06d047904fe96ac8"
-        val referenceSignature = "lnEso6Io2pJvlC6sWDLRkvxvpXqcUpZpvr4sdpHcTGA66Y1zher8KlrnWzQ2tt_lpxpx2YYdbfdtkfVmwjex2Q"
+        val referenceSignature = "lnEso6Io2pJvlC6sWDLRkvxvpXqcUpZpvr4sdpHcTGA66Y1zher8KlrnWzQ2tt_lpxpx2YYdbfdtkfVmwjex2Q".decodeJose(28)
+
         val referencePayload = Base64.encodeToString("Hello world".toByteArray(), Base64.DEFAULT)
 
         ensureSeedIsImported(referenceSeedPhrase)
 
         val latch = CountDownLatch(1)
 
-        UportHDSigner().signJwtBundle(activity, referenceRootAddress, UportHDSigner.UPORT_ROOT_DERIVATION_PATH, referencePayload, "", { error, signature ->
+        UportHDSigner().signJwtBundle(activity, referenceRootAddress, UportHDSigner.UPORT_ROOT_DERIVATION_PATH, referencePayload, "") { error, signature ->
             assertNull(error)
             assertEquals(referenceSignature, signature)
 
             latch.countDown()
-        })
+        }
 
         latch.await()
 
@@ -120,21 +126,21 @@ class HDSignerTests {
 
         //check that retrieving it yields the same phrase
         val latch = CountDownLatch(1)
-        UportHDSigner().showHDSeed(activity, referenceRootAddress, "", { ex, phrase ->
+        UportHDSigner().showHDSeed(activity, referenceRootAddress, "") { ex, phrase ->
             assertNull(ex)
             assertEquals(referenceSeedPhrase, phrase)
             latch.countDown()
-        })
+        }
         latch.await()
     }
 
     private fun ensureSeedIsImported(phrase: String) {
         //ensure seed is imported
         val latch = CountDownLatch(1)
-        UportHDSigner().importHDSeed(mActivityRule.activity, KeyProtection.Level.SIMPLE, phrase, { err, _, _ ->
+        UportHDSigner().importHDSeed(mActivityRule.activity, KeyProtection.Level.SIMPLE, phrase) { err, _, _ ->
             assertNull(err)
             latch.countDown()
-        })
+        }
         latch.await()
     }
 
