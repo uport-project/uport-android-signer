@@ -17,7 +17,11 @@ android {
         multiDexEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        testApplicationId "com.uport.sdk.signer.test"
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -31,6 +35,10 @@ android {
         jumboMode true
     }
 
+    testOptions {
+        animationsDisabled = true
+    }
+
 }
 
 dependencies {
@@ -40,9 +48,7 @@ dependencies {
 
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test:rules:$test_runner_version"
-//    androidTestImplementation("com.android.support.test.espresso:espresso-core:$espresso_version", {
-//        exclude group: "com.android.support", module: "support-annotations"
-//    })
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 }
