@@ -20,7 +20,7 @@ class SimpleAsymmetricProtectionTest {
 
     @Test
     fun encryptDecryptRandomBlobsOfMultipleSizes() {
-        val context = InstrumentationRegistry.getContext()
+        val context = InstrumentationRegistry.getTargetContext()
         SimpleAsymmetricProtection().genKey(context)
 
         val textSize = listOf(128)//, 256, 512, 1024, 2048, 4096, 13, 1234, 6123)

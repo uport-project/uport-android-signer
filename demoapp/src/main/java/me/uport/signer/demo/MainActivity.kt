@@ -13,15 +13,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        createKeys.setOnClickListener({
+        createKeys.setOnClickListener {
             val createKeysIntent = Intent(this, CreateKeysActivity::class.java)
             startActivity(createKeysIntent)
-        })
+        }
 
-        useKeys.setOnClickListener({
+        useKeys.setOnClickListener {
             val useKeysIntent = Intent(this, UseKeysActivity::class.java)
             startActivity(useKeysIntent)
-        })
+        }
     }
 
 }

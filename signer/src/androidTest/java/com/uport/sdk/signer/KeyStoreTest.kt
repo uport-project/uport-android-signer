@@ -48,12 +48,8 @@ class KeyStoreTest {
     private var alias = "__key_store_test_key_alias__"
 
     @Before
-    fun setUp() {
+    fun runBeforeEachTest() {
         context = InstrumentationRegistry.getTargetContext()
-        Security.addProvider(BouncyCastleProvider())
-        Security.getProviders().forEach {
-            println(it.name)
-        }
     }
 
     fun genSymmetricKey(): SecretKey {

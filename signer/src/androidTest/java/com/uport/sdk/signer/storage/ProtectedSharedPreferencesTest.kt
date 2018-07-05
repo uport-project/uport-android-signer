@@ -20,7 +20,7 @@ class ProtectedSharedPreferencesTest {
 
     @Before
     fun before() {
-        context = InstrumentationRegistry.getContext()
+        context = InstrumentationRegistry.getTargetContext()
         val basePrefs = context.getSharedPreferences("test_prefs", MODE_PRIVATE)
         prefs = ProtectedSharedPreferences(context, basePrefs)
     }

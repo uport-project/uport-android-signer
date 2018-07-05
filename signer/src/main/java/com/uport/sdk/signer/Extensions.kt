@@ -2,7 +2,7 @@ package com.uport.sdk.signer
 
 import android.util.Base64
 import org.kethereum.crypto.ECKeyPair
-import org.kethereum.crypto.Keys.PRIVATE_KEY_SIZE
+import org.kethereum.crypto.PRIVATE_KEY_SIZE
 import org.kethereum.extensions.toBytesPadded
 import org.kethereum.model.SignatureData
 import org.spongycastle.asn1.ASN1EncodableVector
