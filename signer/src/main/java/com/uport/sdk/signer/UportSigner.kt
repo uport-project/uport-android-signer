@@ -337,11 +337,28 @@ open class UportSigner {
 
         val hasCorrespondingLevelKey = { prefs: SharedPreferences, label: String -> prefs.contains(asLevelLabel(label)) }
 
+        /**
+         * This is thrown by KeyguardProtection when the user has not configured any device security.
+         * Prompt the user to setup PIN / Pattern / Password protection for their device.
+         * You can use Intent(Settings.ACTION_SECURITY_SETTINGS) to lead them to Android Settings -> Security tab
+         */
+        const val ERR_KEYGUARD_NOT_CONFIGURED = "E_KEYGUARD_NOT_CONFIGURED"
+
+        /**
+         * Thrown when trying to encrypt/decrypt something with a key that is not registered
+         */
         const val ERR_KEY_NOT_REGISTERED = "E_KEY_NOT_REGISTERED"
         const val ERR_KEY_CORRUPTED = "E_KEY_CORRUPTED"
         const val ERR_BLANK_KEY = "E_BLANK_KEY"
         const val ERR_ENCODING_ERROR = "E_ENCODING_PROBLEM"
         const val ERR_AUTH_CANCELED = "E_AUTH_CANCELED"
+
+        /**
+         * Thrown when the [KeyProtection.Level] requested is [KeyProtection.Level.SINGLE_PROMPT] or [KeyProtection.Level.PROMPT]
+         * but the requested operation is being performed outside an activity context.
+         *
+         * For signing stuff with these protection levels, an activity is needed to launch the proper UI.
+         */
         const val ERR_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST"
 
         const val UNCOMPRESSED_PUBLIC_KEY_SIZE = PUBLIC_KEY_SIZE + 1

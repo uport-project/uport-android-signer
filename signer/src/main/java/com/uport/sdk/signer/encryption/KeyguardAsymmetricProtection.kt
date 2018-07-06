@@ -2,10 +2,10 @@ package com.uport.sdk.signer.encryption
 
 import android.app.Activity
 import android.content.Context
-import android.security.keystore.UserNotAuthenticatedException
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
+import java.security.InvalidKeyException
 
 class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_SECONDS) : KeyProtection() {
 
@@ -18,7 +18,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
     fun genKey(context: Context) {
 
         if (!KeyProtection.canUseKeychainAuthentication(context)) {
-            return
+            throw IllegalStateException(UportSigner.ERR_KEYGUARD_NOT_CONFIGURED)
         }
 
         generateKey(context, alias, true, sessionTimeout)
@@ -42,7 +42,8 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
             val cleartextBytes = decryptRaw(ciphertext, alias)
             callback(null, cleartextBytes)
 
-        } catch (exception: UserNotAuthenticatedException) {
+        } catch (exception: InvalidKeyException) {
+            //TODO: check if exception is UserNotAuthenticatedException on API 23+
             //keyguard needs an activity present
             if (context is AppCompatActivity) {
                 showKeyguard(
@@ -62,6 +63,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
                 callback(IllegalStateException(ERR_ACTIVITY_DOES_NOT_EXIST), ByteArray(0))
             }
         } catch (ex: Exception) {
+            //TODO: possible scenario to address: if the device has just configured PIN and has never been unlocked, this may throw InvalidBlockSizeException
             callback(ex, ByteArray(0))
         }
 
