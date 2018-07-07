@@ -63,7 +63,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
                 callback(IllegalStateException(ERR_ACTIVITY_DOES_NOT_EXIST), ByteArray(0))
             }
         } catch (ex: Exception) {
-            //TODO: possible scenario to address: if the device has just configured PIN and has never been unlocked, this may throw InvalidBlockSizeException
+            //TODO: possible scenario to address: if the device has just configured PIN and has never been unlocked, this may throw IllegalBlockSizeException
             callback(ex, ByteArray(0))
         }
 
