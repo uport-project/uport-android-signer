@@ -8,6 +8,8 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getWrappingCipher
 import com.uport.sdk.signer.unpackCiphertext
 import javax.crypto.Cipher
 

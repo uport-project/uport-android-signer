@@ -8,11 +8,12 @@ import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.ANDROID_KEYSTORE_PROVIDER
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getKeyStore
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getWrappingCipher
 import com.uport.sdk.signer.packCiphertext
 import com.uport.sdk.signer.unpackCiphertext
-import com.uport.sdk.signer.encryption.KeyProtection.Companion.generateWrappingKey
-import com.uport.sdk.signer.encryption.KeyProtection.Companion.getWrappingCipher
-import java.security.KeyStore
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.Cipher.*
@@ -21,22 +22,16 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
 
-class CryptoUtil(context: Context) {
+class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
     private val appContext = context.applicationContext
-
-    private fun getKeyStore(): KeyStore {
-        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_PROVIDER)
-        keyStore.load(null)
-        return keyStore
-    }
 
     //used for symmetric encryption on API 23+
     @TargetApi(Build.VERSION_CODES.M)
     private fun genEncryptionKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(ALGORITHM_AES, ANDROID_KEYSTORE_PROVIDER)
         val purpose = KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-        val builder = KeyGenParameterSpec.Builder(keyAlias, purpose)
+        val builder = KeyGenParameterSpec.Builder(alias, purpose)
 
         builder.setBlockModes(BLOCK_MODE)
                 .setKeySize(AES_KEY_SIZE)
@@ -60,7 +55,7 @@ class CryptoUtil(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val cipher = Cipher.getInstance(AES_TRANSFORMATION)
 
-            val secretKey = keyStore.getKey(keyAlias, null) ?: genEncryptionKey()
+            val secretKey = keyStore.getKey(alias, null) ?: genEncryptionKey()
             cipher.init(Cipher.ENCRYPT_MODE, secretKey)
             val encryptedBytes = cipher.doFinal(blob)
 
@@ -69,9 +64,9 @@ class CryptoUtil(context: Context) {
             val oneTimeKey = genOneTimeKey()
 
             //ensure public key exists
-            keyStore.getCertificate(keyAlias)?.publicKey ?: generateWrappingKey(appContext, keyAlias)
+            keyStore.getCertificate(alias)?.publicKey ?: generateWrappingKey(appContext, alias)
 
-            val wrappingCipher = getWrappingCipher(WRAP_MODE, keyAlias)
+            val wrappingCipher = getWrappingCipher(WRAP_MODE, alias)
             val wrappedKey = wrappingCipher.wrap(oneTimeKey)
 
             val encryptingCipher = Cipher.getInstance(AES_TRANSFORMATION)
@@ -89,7 +84,7 @@ class CryptoUtil(context: Context) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            val secretKey = keyStore.getKey(keyAlias, null) ?: genEncryptionKey()
+            val secretKey = keyStore.getKey(alias, null) ?: genEncryptionKey()
             val cipher = Cipher.getInstance(AES_TRANSFORMATION)
 
             val (iv, encryptedBytes) = unpackCiphertext(ciphertext)
@@ -98,7 +93,7 @@ class CryptoUtil(context: Context) {
 
             return cipher.doFinal(encryptedBytes)
         } else {
-            val wrappingCipher = getWrappingCipher(UNWRAP_MODE, keyAlias)
+            val wrappingCipher = getWrappingCipher(UNWRAP_MODE, alias)
             val (wrappedKey, iv, encryptedBytes) = unpackCiphertext(ciphertext)
 
             val encryptionKey = wrappingCipher.unwrap(wrappedKey, ALGORITHM_AES, SECRET_KEY)
@@ -110,8 +105,7 @@ class CryptoUtil(context: Context) {
     }
 
     companion object {
-        private const val keyAlias = "simple_protection_key_alias"
-        private const val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
+        private const val DEFAULT_ALIAS = "simple_protection_key_alias"
 
         private const val AES_KEY_SIZE = 256
 

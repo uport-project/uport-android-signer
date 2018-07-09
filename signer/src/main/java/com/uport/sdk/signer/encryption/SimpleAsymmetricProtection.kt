@@ -1,6 +1,7 @@
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
 
 class SimpleAsymmetricProtection : KeyProtection() {
 

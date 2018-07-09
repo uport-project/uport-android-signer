@@ -5,6 +5,7 @@ import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
 import java.security.InvalidKeyException
 
 class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_SECONDS) : KeyProtection() {
@@ -21,7 +22,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
             throw IllegalStateException(UportSigner.ERR_KEYGUARD_NOT_CONFIGURED)
         }
 
-        KeyProtection.generateWrappingKey(context, alias, true, sessionTimeout)
+        generateWrappingKey(context, alias, true, sessionTimeout)
     }
 
     override
