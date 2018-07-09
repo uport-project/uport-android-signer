@@ -19,7 +19,7 @@ class FingerprintAsymmetricProtection : KeyProtection() {
     override
     fun genKey(context: Context) {
 
-        generateKey(context, alias, true)
+        generateWrappingKey(context, alias, true)
     }
 
     override
@@ -39,7 +39,7 @@ class FingerprintAsymmetricProtection : KeyProtection() {
         try {
             val (encryptedBytes) = unpackCiphertext(ciphertext)
 
-            val cipher = getCipher(Cipher.DECRYPT_MODE, alias)
+            val cipher = getWrappingCipher(Cipher.DECRYPT_MODE, alias)
 
             if (context is AppCompatActivity) {
                 showFingerprintDialog(context, purpose, cipher) { err, cryptoObject ->

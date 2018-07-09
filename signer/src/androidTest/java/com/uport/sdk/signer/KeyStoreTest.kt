@@ -15,14 +15,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.SecureRandom
-import java.security.Security
 import java.security.spec.MGF1ParameterSpec
 import java.security.spec.RSAKeyGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
@@ -125,9 +123,9 @@ class KeyStoreTest {
                         .setEndDate(endDate)
                 // Only API levels 19 and above allow specifying RSA key parameters.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    val rsaSpec = RSAKeyGenParameterSpec(KeyProtection.KEY_SIZE, RSAKeyGenParameterSpec.F4)
+                    val rsaSpec = RSAKeyGenParameterSpec(KeyProtection.WRAPPING_KEY_SIZE, RSAKeyGenParameterSpec.F4)
                     specBuilder.setAlgorithmParameterSpec(rsaSpec)
-                    specBuilder.setKeySize(KeyProtection.KEY_SIZE)
+                    specBuilder.setKeySize(KeyProtection.WRAPPING_KEY_SIZE)
                 }
                 if (requiresAuth) {
                     specBuilder.setEncryptionRequired()

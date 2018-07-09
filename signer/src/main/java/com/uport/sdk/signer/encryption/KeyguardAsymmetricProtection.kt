@@ -21,13 +21,13 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
             throw IllegalStateException(UportSigner.ERR_KEYGUARD_NOT_CONFIGURED)
         }
 
-        generateKey(context, alias, true, sessionTimeout)
+        KeyProtection.generateWrappingKey(context, alias, true, sessionTimeout)
     }
 
     override
     fun encrypt(context: Context, purpose: String, blob: ByteArray, callback: (err: Exception?, ciphertext: String) -> Unit) {
         try {
-            val ciphertext = encryptRaw(blob, alias)
+            val ciphertext = KeyProtection.encryptRaw(blob, alias)
             callback(null, ciphertext)
         } catch (ex: Exception) {
             callback(ex, "")
@@ -39,7 +39,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = SESSION_TIMEOUT_
     fun decrypt(context: Context, purpose: String, ciphertext: String, callback: (err: Exception?, cleartext: ByteArray) -> Unit) {
 
         try {
-            val cleartextBytes = decryptRaw(ciphertext, alias)
+            val cleartextBytes = KeyProtection.decryptRaw(ciphertext, alias)
             callback(null, cleartextBytes)
 
         } catch (exception: InvalidKeyException) {

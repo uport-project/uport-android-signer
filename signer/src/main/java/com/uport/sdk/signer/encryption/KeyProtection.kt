@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.uport.sdk.signer.encryption
 
 import android.app.KeyguardManager
@@ -14,24 +16,14 @@ import com.uport.sdk.signer.packCiphertext
 import com.uport.sdk.signer.unpackCiphertext
 import java.io.IOException
 import java.math.BigInteger
-import java.security.InvalidAlgorithmParameterException
-import java.security.InvalidKeyException
-import java.security.KeyFactory
-import java.security.KeyPairGenerator
-import java.security.KeyStore
-import java.security.KeyStoreException
-import java.security.NoSuchAlgorithmException
-import java.security.NoSuchProviderException
-import java.security.PrivateKey
-import java.security.UnrecoverableKeyException
+import java.security.*
 import java.security.spec.MGF1ParameterSpec
 import java.security.spec.RSAKeyGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
-import javax.crypto.Cipher.DECRYPT_MODE
-import javax.crypto.Cipher.ENCRYPT_MODE
+import javax.crypto.Cipher.*
 import javax.crypto.IllegalBlockSizeException
 import javax.crypto.spec.OAEPParameterSpec
 import javax.crypto.spec.PSource
@@ -72,140 +64,12 @@ abstract class KeyProtection {
 
     abstract val alias: String
 
-    @Throws(KeyStoreException::class,
-            NoSuchProviderException::class,
-            NoSuchAlgorithmException::class,
-            InvalidAlgorithmParameterException::class)
-    internal fun generateKey(context: Context, keyAlias: String, requiresAuth: Boolean = false, sessionTimeout: Int = -1) {
-
-        val keyStore = getKeyStore()
-
-        val publicKey = keyStore.getCertificate(keyAlias)?.publicKey
-
-        if (publicKey == null) {
-
-            val spec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_DECRYPT)
-                        .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-                        .setUserAuthenticationRequired(requiresAuth)
-                        .setUserAuthenticationValidityDurationSeconds(sessionTimeout)
-                        .build()
-            } else {
-                val cal = Calendar.getInstance()
-                val startDate: Date = cal.time
-                cal.add(Calendar.YEAR, 100)
-                val endDate: Date = cal.time
-
-                val specBuilder = KeyPairGeneratorSpec.Builder(context)
-                        .setAlias(keyAlias)
-                        .setSubject(X500Principal("CN=$keyAlias"))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(startDate)
-                        .setEndDate(endDate)
-                // Only API levels 19 and above allow specifying RSA key parameters.
-                if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
-                    val rsaSpec = RSAKeyGenParameterSpec(KEY_SIZE, RSAKeyGenParameterSpec.F4)
-                    specBuilder.setAlgorithmParameterSpec(rsaSpec)
-                    specBuilder.setKeySize(KEY_SIZE)
-                }
-                if (requiresAuth) {
-                    specBuilder.setEncryptionRequired()
-                }
-                specBuilder.build()
-            }
-
-            val keyPairGenerator = KeyPairGenerator.getInstance("RSA", ANDROID_KEYSTORE_PROVIDER)
-            keyPairGenerator.initialize(spec)
-            keyPairGenerator.generateKeyPair()
-        }
-    }
-
-    @Throws(KeyPermanentlyInvalidatedException::class,
-            KeyStoreException::class,
-            CertificateException::class,
-            UnrecoverableKeyException::class,
-            IOException::class,
-            NoSuchAlgorithmException::class,
-            InvalidKeyException::class,
-            InvalidAlgorithmParameterException::class)
-    internal fun getCipher(mode: Int, keyAlias: String): Cipher {
-
-        val keyStore = getKeyStore()
-
-        val cipher = Cipher.getInstance(ASYMMETRIC_TRANSFORMATION)
-
-        if (mode == DECRYPT_MODE) {
-
-            val privateKey = keyStore.getKey(keyAlias, null) as PrivateKey
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val spec = OAEPParameterSpec(
-                        "SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
-                cipher.init(mode, privateKey, spec)
-            } else {
-                cipher.init(mode, privateKey)
-            }
-
-        } else if (mode == ENCRYPT_MODE) {
-
-            val publicKey = keyStore.getCertificate(keyAlias).publicKey
-
-            //due to a bug in API23, the public key needs to be separated from the keystore
-            val unrestricted = KeyFactory.getInstance(publicKey.algorithm)
-                    .generatePublic(X509EncodedKeySpec(publicKey.encoded))
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val spec = OAEPParameterSpec(
-                        "SHA-256", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
-                cipher.init(mode, unrestricted, spec)
-            } else {
-                cipher.init(mode, unrestricted)
-            }
-
-        }
-        return cipher
-    }
-
-    @Throws(KeyStoreException::class,
-            NoSuchProviderException::class)
-    private fun getKeyStore(): KeyStore {
-        // Get a KeyStore instance with the Android Keystore provider.
-        val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_PROVIDER)
-
-        // Relict of the old JCA API - you have to call load() even
-        // if you do not have an input stream you want to load - otherwise it'll crash.
-        keyStore.load(null)
-        return keyStore
-    }
-
-    @Throws(IllegalBlockSizeException::class, BadPaddingException::class)
-    internal fun encryptRaw(blob: ByteArray, keyAlias: String): String {
-
-        val cipher = getCipher(ENCRYPT_MODE, keyAlias)
-
-        val encryptedBytes = cipher.doFinal(blob)
-
-        return packCiphertext(encryptedBytes)
-    }
-
-    @Throws(IllegalBlockSizeException::class, BadPaddingException::class)
-    internal fun decryptRaw(ciphertext: String, keyAlias: String): ByteArray {
-
-        val cipher = getCipher(DECRYPT_MODE, keyAlias)
-
-        val (encryptedBytes) = unpackCiphertext(ciphertext)
-
-        return cipher.doFinal(encryptedBytes)
-    }
-
     companion object {
         const val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
 
         val ASYMMETRIC_TRANSFORMATION =
                 if (Build.VERSION.SDK_INT >= VERSION_CODES.M)
-//                    "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
-                    "RSA/ECB/OAEPPadding"
+                    "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
                 else
                     "RSA/ECB/PKCS1Padding"
 
@@ -252,6 +116,128 @@ abstract class KeyProtection {
             }
         }
 
-        const val KEY_SIZE = 2048
+        const val WRAPPING_KEY_SIZE = 2048
+
+        private val OAEP_SPEC = OAEPParameterSpec(
+                "SHA-256", "MGF1",
+                MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+
+        @Throws(KeyPermanentlyInvalidatedException::class,
+                KeyStoreException::class,
+                CertificateException::class,
+                UnrecoverableKeyException::class,
+                IOException::class,
+                NoSuchAlgorithmException::class,
+                InvalidKeyException::class,
+                InvalidAlgorithmParameterException::class)
+        fun getWrappingCipher(mode: Int, keyAlias: String): Cipher {
+
+            val keyStore = getKeyStore()
+
+            val cipher = getInstance(ASYMMETRIC_TRANSFORMATION)
+
+            val key = when (mode) {
+                DECRYPT_MODE, UNWRAP_MODE -> {
+                    keyStore.getKey(keyAlias, null) as PrivateKey
+                }
+            //ENCRYPT_MODE, WRAP_MODE
+                else -> {
+                    val pubKey = keyStore.getCertificate(keyAlias).publicKey
+                    //due to a bug in API23, the public key needs to be separated from the keystore
+                    KeyFactory.getInstance(pubKey.algorithm)
+                            .generatePublic(X509EncodedKeySpec(pubKey.encoded)) as PublicKey
+                }
+            }
+
+            if (VERSION.SDK_INT >= VERSION_CODES.M) {
+                cipher.init(mode, key, OAEP_SPEC)
+            } else {
+                cipher.init(mode, key)
+            }
+
+            return cipher
+        }
+
+        @Throws(KeyStoreException::class,
+                NoSuchProviderException::class)
+        private fun getKeyStore(): KeyStore {
+            // Get a KeyStore instance with the Android Keystore provider.
+            val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_PROVIDER)
+
+            // Relict of the old JCA API - you have to call load() even
+            // if you do not have an input stream you want to load - otherwise it'll crash.
+            keyStore.load(null)
+            return keyStore
+        }
+
+        @Throws(KeyStoreException::class,
+                NoSuchProviderException::class,
+                NoSuchAlgorithmException::class,
+                InvalidAlgorithmParameterException::class)
+        fun generateWrappingKey(context: Context, keyAlias: String, requiresAuth: Boolean = false, sessionTimeout: Int = -1) {
+
+            val keyStore = getKeyStore()
+
+            val publicKey = keyStore.getCertificate(keyAlias)?.publicKey
+
+            if (publicKey == null) {
+
+                val spec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_DECRYPT)
+                            .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
+                            .setUserAuthenticationRequired(requiresAuth)
+                            .setUserAuthenticationValidityDurationSeconds(sessionTimeout)
+                            .build()
+                } else {
+                    val cal = Calendar.getInstance()
+                    val startDate: Date = cal.time
+                    cal.add(Calendar.YEAR, 100)
+                    val endDate: Date = cal.time
+
+                    @Suppress("DEPRECATION")
+                    val specBuilder = KeyPairGeneratorSpec.Builder(context)
+                            .setAlias(keyAlias)
+                            .setSubject(X500Principal("CN=$keyAlias"))
+                            .setSerialNumber(BigInteger.ONE)
+                            .setStartDate(startDate)
+                            .setEndDate(endDate)
+                    // Only API levels 19 and above allow specifying RSA key parameters.
+                    if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+                        val rsaSpec = RSAKeyGenParameterSpec(WRAPPING_KEY_SIZE, RSAKeyGenParameterSpec.F4)
+                        specBuilder.setAlgorithmParameterSpec(rsaSpec)
+                        specBuilder.setKeySize(WRAPPING_KEY_SIZE)
+                    }
+                    if (requiresAuth) {
+                        specBuilder.setEncryptionRequired()
+                    }
+                    specBuilder.build()
+                }
+
+                val keyPairGenerator = KeyPairGenerator.getInstance("RSA", ANDROID_KEYSTORE_PROVIDER)
+                keyPairGenerator.initialize(spec)
+                keyPairGenerator.generateKeyPair()
+            }
+        }
+
+        @Throws(IllegalBlockSizeException::class, BadPaddingException::class)
+        internal fun encryptRaw(blob: ByteArray, keyAlias: String): String {
+
+            val cipher = getWrappingCipher(ENCRYPT_MODE, keyAlias)
+
+            val encryptedBytes = cipher.doFinal(blob)
+
+            return packCiphertext(encryptedBytes)
+        }
+
+        @Throws(IllegalBlockSizeException::class, BadPaddingException::class)
+        internal fun decryptRaw(ciphertext: String, keyAlias: String): ByteArray {
+
+            val cipher = getWrappingCipher(DECRYPT_MODE, keyAlias)
+
+            val (encryptedBytes) = unpackCiphertext(ciphertext)
+
+            return cipher.doFinal(encryptedBytes)
+        }
     }
 }

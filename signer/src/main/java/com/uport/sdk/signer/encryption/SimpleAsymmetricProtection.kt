@@ -10,7 +10,7 @@ class SimpleAsymmetricProtection : KeyProtection() {
     override
     fun genKey(context: Context) {
 
-        generateKey(context, alias)
+        generateWrappingKey(context, alias)
 
     }
 
