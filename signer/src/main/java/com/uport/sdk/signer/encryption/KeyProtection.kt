@@ -2,11 +2,14 @@
 
 package com.uport.sdk.signer.encryption
 
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
-import android.os.Build
+import com.uport.sdk.signer.DecryptionCallback
+import com.uport.sdk.signer.EncryptionCallback
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getWrappingCipher
+import com.uport.sdk.signer.hasMarshmallow
 import com.uport.sdk.signer.packCiphertext
 import com.uport.sdk.signer.unpackCiphertext
 import javax.crypto.BadPaddingException
@@ -42,8 +45,8 @@ abstract class KeyProtection {
     }
 
     abstract fun genKey(context: Context)
-    abstract fun encrypt(context: Context, purpose: String = "", blob: ByteArray, callback: (err: Exception?, ciphertext: String) -> Unit)
-    abstract fun decrypt(context: Context, purpose: String = "", ciphertext: String, callback: (err: Exception?, cleartext: ByteArray) -> Unit)
+    abstract fun encrypt(context: Context, purpose: String = "", blob: ByteArray, callback: EncryptionCallback)
+    abstract fun decrypt(context: Context, purpose: String = "", ciphertext: String, callback: DecryptionCallback)
 
     abstract val alias: String
 
@@ -55,8 +58,9 @@ abstract class KeyProtection {
             return keyguardManager.isKeyguardSecure
         }
 
+        @SuppressLint("NewApi")
         fun hasSetupFingerprint(context: Context): Boolean {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (hasMarshmallow()) {
                 val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
                 try {
                     if (!mFingerprintManager.isHardwareDetected) {
@@ -77,8 +81,9 @@ abstract class KeyProtection {
             }
         }
 
+        @SuppressLint("NewApi")
         fun hasFingerprintHardware(context: Context): Boolean {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return if (hasMarshmallow()) {
                 val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
                 try {
                     mFingerprintManager.isHardwareDetected

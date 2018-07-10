@@ -54,9 +54,9 @@ class ProtectedSharedPreferences(context: Context, internal val delegate: Shared
 
         return allKeyPrefixes
                 .map { "$it:$key" }
-                .fold(false, { foundIt, queryKey ->
+                .fold(false) { foundIt, queryKey ->
                     foundIt or (delegate.contains(queryKey) and canDecrypt(queryKey))
-                })
+                }
     }
 
     private fun canDecrypt(queryKey: String): Boolean {
@@ -69,7 +69,7 @@ class ProtectedSharedPreferences(context: Context, internal val delegate: Shared
             }
             true
         } catch (ex: Exception) {
-            System.out.println("removing key: $queryKey because it can't be decrypted")
+            //"removing key: $queryKey because it can't be decrypted"
             delegate.edit().remove(queryKey).apply()
             false
         }

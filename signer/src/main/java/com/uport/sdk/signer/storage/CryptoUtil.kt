@@ -12,6 +12,7 @@ import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.ANDROID_KEYSTORE_PR
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getKeyStore
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getWrappingCipher
+import com.uport.sdk.signer.hasMarshmallow
 import com.uport.sdk.signer.packCiphertext
 import com.uport.sdk.signer.unpackCiphertext
 import java.security.SecureRandom
@@ -52,11 +53,12 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
     fun encrypt(blob: ByteArray): String {
         val keyStore = getKeyStore()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (hasMarshmallow()) {
             val cipher = Cipher.getInstance(AES_TRANSFORMATION)
 
             val secretKey = keyStore.getKey(alias, null) ?: genEncryptionKey()
             cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            //FIXME: On some devices (like emulator with API 24) this throws IllegalBlockSizeException for large blobs (ex 4096 bytes)
             val encryptedBytes = cipher.doFinal(blob)
 
             return packCiphertext(cipher.iv, encryptedBytes)
@@ -82,7 +84,7 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
         val keyStore = getKeyStore()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (hasMarshmallow()) {
 
             val secretKey = keyStore.getKey(alias, null) ?: genEncryptionKey()
             val cipher = Cipher.getInstance(AES_TRANSFORMATION)

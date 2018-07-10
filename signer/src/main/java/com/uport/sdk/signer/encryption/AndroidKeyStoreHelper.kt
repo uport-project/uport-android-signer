@@ -2,15 +2,27 @@
 
 package com.uport.sdk.signer.encryption
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
+import com.uport.sdk.signer.hasMarshmallow
 import java.io.IOException
 import java.math.BigInteger
-import java.security.*
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
+import java.security.KeyFactory
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.NoSuchProviderException
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.UnrecoverableKeyException
 import java.security.spec.MGF1ParameterSpec
 import java.security.spec.RSAKeyGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
@@ -29,7 +41,7 @@ object AndroidKeyStoreHelper {
     /**
      * Size of the RSA key used to wrap the protected key
      */
-    const val WRAPPING_KEY_SIZE = 2048
+    private const val WRAPPING_KEY_SIZE = 2048
 
     /**
      * [java.security.spec.AlgorithmParameterSpec] applied to the wrapping cipher on API 23+
@@ -41,8 +53,8 @@ object AndroidKeyStoreHelper {
     /**
      * The cipher transformation used to wrap the protected key
      */
-    val WRAPPING_TRANSFORMATION =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+    private val WRAPPING_TRANSFORMATION =
+            if (hasMarshmallow())
                 "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
             else
                 "RSA/ECB/PKCS1Padding"
@@ -62,7 +74,6 @@ object AndroidKeyStoreHelper {
         keyStore.load(null)
         return keyStore
     }
-
 
     @Throws(KeyPermanentlyInvalidatedException::class,
             KeyStoreException::class,
@@ -93,7 +104,7 @@ object AndroidKeyStoreHelper {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (hasMarshmallow()) {
             cipher.init(mode, key, OAEP_SPEC)
         } else {
             cipher.init(mode, key)
@@ -102,6 +113,7 @@ object AndroidKeyStoreHelper {
         return cipher
     }
 
+    @SuppressLint("NewApi")
     @Throws(KeyStoreException::class,
             NoSuchProviderException::class,
             NoSuchAlgorithmException::class,
@@ -109,12 +121,11 @@ object AndroidKeyStoreHelper {
     fun generateWrappingKey(context: Context, keyAlias: String, requiresAuth: Boolean = false, sessionTimeout: Int = -1) {
 
         val keyStore = getKeyStore()
-
         val publicKey = keyStore.getCertificate(keyAlias)?.publicKey
 
         if (publicKey == null) {
 
-            val spec = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val spec = if (hasMarshmallow()) {
                 KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_DECRYPT)
                         .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)

@@ -6,6 +6,8 @@ import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
+import com.uport.sdk.signer.DecryptionCallback
+import com.uport.sdk.signer.EncryptionCallback
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
@@ -25,7 +27,7 @@ class FingerprintAsymmetricProtection : KeyProtection() {
     }
 
     override
-    fun encrypt(context: Context, purpose: String, blob: ByteArray, callback: (err: Exception?, ciphertext: String) -> Unit) {
+    fun encrypt(context: Context, purpose: String, blob: ByteArray, callback: EncryptionCallback) {
         try {
             val ciphertext = encryptRaw(blob, alias)
             callback(null, ciphertext)
@@ -36,7 +38,7 @@ class FingerprintAsymmetricProtection : KeyProtection() {
 
     @TargetApi(Build.VERSION_CODES.M)
     override
-    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: (err: Exception?, cleartext: ByteArray) -> Unit) {
+    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
 
         try {
             val (encryptedBytes) = unpackCiphertext(ciphertext)
