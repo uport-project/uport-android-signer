@@ -30,6 +30,19 @@ class FingerprintGuardedKeyActivity : AppCompatActivity() {
             hardware_status.text = hardwareStatusText
         }
 
+        createKeyBtn.setOnClickListener {
+            //KeyProtection.Level.PROMPT will default to Keyguard when no fingerprints are available
+            UportHDSigner().createHDSeed(this, KeyProtection.Level.PROMPT) { err, address, publicKey ->
+
+                if (err != null) {
+                    key_status.text = err.message
+                    return@createHDSeed
+                }
+                key_status.text = "key created: $address"
+                hdSeedHandle = address
+            }
+        }
+
         signBtn.setOnClickListener {
 
             //random payload to be signed
@@ -52,20 +65,6 @@ class FingerprintGuardedKeyActivity : AppCompatActivity() {
                 }
             }
         }
-
-        createKeyBtn.setOnClickListener {
-            //KeyProtection.Level.PROMPT will default to Keyguard when no fingerprints are available
-            UportHDSigner().createHDSeed(this, KeyProtection.Level.PROMPT) { err, address, publicKey ->
-
-                if (err != null) {
-                    key_status.text = err.message
-                    return@createHDSeed
-                }
-                key_status.text = "key created: $address"
-                hdSeedHandle = address
-            }
-        }
-
 
     }
 }

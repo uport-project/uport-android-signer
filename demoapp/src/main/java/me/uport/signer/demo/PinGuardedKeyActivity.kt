@@ -22,6 +22,18 @@ class PinGuardedKeyActivity : AppCompatActivity() {
             hardware_status.text = hardwareStatusText
         }
 
+        createKeyBtn.setOnClickListener {
+            UportHDSigner().createHDSeed(this, KeyProtection.Level.SINGLE_PROMPT) { err, address, publicKey ->
+
+                if (err != null) {
+                    key_status.text = err.message
+                    return@createHDSeed
+                }
+                key_status.text = "key created: $address"
+                hdSeedHandle = address
+            }
+        }
+
         signBtn.setOnClickListener {
 
             //random payload to be signed
@@ -45,17 +57,6 @@ class PinGuardedKeyActivity : AppCompatActivity() {
             }
         }
 
-        createKeyBtn.setOnClickListener {
-            UportHDSigner().createHDSeed(this, KeyProtection.Level.SINGLE_PROMPT) { err, address, publicKey ->
-
-                if (err != null) {
-                    key_status.text = err.message
-                    return@createHDSeed
-                }
-                key_status.text = "key created: $address"
-                hdSeedHandle = address
-            }
-        }
 
 
     }
