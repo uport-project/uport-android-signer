@@ -1,5 +1,6 @@
 package com.uport.sdk.signer
 
+import android.os.Build
 import android.util.Base64
 import org.kethereum.crypto.ECKeyPair
 import org.kethereum.crypto.PRIVATE_KEY_SIZE
@@ -64,3 +65,8 @@ internal fun ECKeyPair.getUncompressedPublicKeyWithPrefix(): ByteArray {
 
 fun BigInteger.keyToBase64(keySize: Int = PRIVATE_KEY_SIZE): String =
         Base64.encodeToString(this.toBytesPadded(keySize), Base64.DEFAULT or Base64.NO_WRAP)
+
+fun hasMarshmallow(): Boolean = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+
+typealias EncryptionCallback = (err: Exception?, ciphertext: String) -> Unit
+typealias DecryptionCallback = (err: Exception?, cleartext: ByteArray) -> Unit
