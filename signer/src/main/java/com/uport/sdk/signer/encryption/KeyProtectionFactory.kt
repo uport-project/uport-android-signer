@@ -1,13 +1,21 @@
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
+import android.os.Build
+import android.os.Build.VERSION_CODES.LOLLIPOP
 
 object KeyProtectionFactory {
 
     fun obtain(context: Context, level: KeyProtection.Level): KeyProtection {
 
-        //FIXME: this needs more love; some checks need to be performed before attempting secure storage
-        val store = when (level) {
+        val apiAdjustedLevel = if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+            level
+        } else {
+            //only simple protection is available for KitKat
+            KeyProtection.Level.SIMPLE
+        }
+
+        val store = when (apiAdjustedLevel) {
 
             KeyProtection.Level.SINGLE_PROMPT -> {
                 KeyguardAsymmetricProtection()
