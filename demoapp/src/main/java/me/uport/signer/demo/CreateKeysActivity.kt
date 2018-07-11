@@ -18,19 +18,19 @@ class CreateKeysActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_keys)
         setSupportActionBar(toolbar)
 
-        generateButton.setOnClickListener({
+        generateButton.setOnClickListener {
             val phrase = Mnemonic.generateMnemonic()
             mnemonicPhraseField.setText(phrase)
-        })
+        }
 
-        importButton.setOnClickListener({ _ ->
+        importButton.setOnClickListener { _ ->
             val phrase = mnemonicPhraseField.text.toString()
-            UportHDSigner().importHDSeed(this, KeyProtection.Level.SIMPLE, phrase, { err, address, publicKey ->
+            UportHDSigner().importHDSeed(this, KeyProtection.Level.SIMPLE, phrase) { err, address, publicKey ->
                 errorField.text = "error: ${err.toString()}"
                 publicKeyField.text = "publicKey: ${Base64.decode(publicKey, Base64.DEFAULT).toHexString()}"
                 addressField.text = "address: $address"
-            })
-        })
+            }
+        }
 
     }
 

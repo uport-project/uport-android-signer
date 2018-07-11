@@ -34,6 +34,7 @@ dependencies {
     implementation "com.android.support:design:$support_lib_version"
 
     implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
+    implementation "com.github.walleth.kethereum:bip39:$kethereum_version"
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
     testImplementation("junit:junit:$junit_version")

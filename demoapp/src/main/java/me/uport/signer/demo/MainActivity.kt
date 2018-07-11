@@ -13,15 +13,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        createKeys.setOnClickListener({
-            val createKeysIntent = Intent(this, CreateKeysActivity::class.java)
-            startActivity(createKeysIntent)
-        })
+        createKeys.setOnClickListener {
+            val intent = Intent(this, CreateKeysActivity::class.java)
+            startActivity(intent)
+        }
 
-        useKeys.setOnClickListener({
-            val useKeysIntent = Intent(this, UseKeysActivity::class.java)
-            startActivity(useKeysIntent)
-        })
+        useKeys.setOnClickListener {
+            val intent = Intent(this, UseKeysActivity::class.java)
+            startActivity(intent)
+        }
+
+        use_keyguard.setOnClickListener {
+            val intent = Intent(this, PinGuardedKeyActivity::class.java)
+            startActivity(intent)
+        }
+
+        use_fingerprints.setOnClickListener {
+            val intent = Intent(this, FingerprintGuardedKeyActivity::class.java)
+            startActivity(intent)
+        }
     }
 
 }

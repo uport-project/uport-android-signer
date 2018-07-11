@@ -1,12 +1,15 @@
 package com.uport.sdk.signer.encryption
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context.KEYGUARD_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import com.uport.sdk.signer.hasMarshmallow
 
 class KeyguardLaunchFragment : Fragment() {
 
@@ -17,18 +20,47 @@ class KeyguardLaunchFragment : Fragment() {
     override
     fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         retainInstance = true
         keyguardManager = context?.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+
+        val keyguardIntent = createConfirmDeviceCredentialIntent("uPort", purpose)
+        startActivityForResult(keyguardIntent, REQUEST_CODE_KEYGUARD)
     }
 
-    override
-    fun onStart() {
-        super.onStart()
+    /**
+     * Pops up the keyguard with the corresponding text.
+     * On API 23+, this is needed to unlock keys that have been created with [setRequiresAuthentication(true)]
+     */
+    @SuppressLint("NewApi")
+    private fun createConfirmDeviceCredentialIntent(title: String, description: String): Intent {
+        return if (hasMarshmallow()) {
+            keyguardManager.createConfirmDeviceCredentialIntent(title, description)
+        } else {
+            val action = "android.app.action.CONFIRM_DEVICE_CREDENTIAL"
+            val keyguardIntent = Intent(action)
+            keyguardIntent.putExtra("android.app.extra.DESCRIPTION", description)
 
-        val keyguardIntent = keyguardManager.createConfirmDeviceCredentialIntent("uPort", purpose)
+            keyguardIntent.putExtra("android.app.extra.TITLE", "$title\n\n$description")
+            keyguardIntent.setPackage(getSettingsPackageForIntent(keyguardIntent))
 
-        startActivityForResult(keyguardIntent, Companion.REQUEST_CODE_KEYGUARD)
+            keyguardIntent
+        }
+    }
+
+    /**
+     * based on AOSP KeyguardManager.java for API 23+
+     */
+    @SuppressLint("InlinedApi")
+    private fun getSettingsPackageForIntent(intent: Intent): String {
+        val ctx = context
+        if (ctx != null) {
+            val resolveInfos = ctx.packageManager
+                    .queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY)
+            for (i in resolveInfos.indices) {
+                return resolveInfos[i].activityInfo.packageName
+            }
+        }
+        return "com.android.settings"
     }
 
     private fun init(purpose: String, callback: KeyguardCallback) {
@@ -38,7 +70,7 @@ class KeyguardLaunchFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Companion.REQUEST_CODE_KEYGUARD) {
+        if (requestCode == REQUEST_CODE_KEYGUARD) {
             val result = resultCode == Activity.RESULT_OK
             callback.onKeyguardResult(result)
             dismiss()

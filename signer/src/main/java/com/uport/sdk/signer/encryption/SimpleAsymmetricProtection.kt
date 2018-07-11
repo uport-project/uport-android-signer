@@ -1,6 +1,9 @@
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
+import com.uport.sdk.signer.DecryptionCallback
+import com.uport.sdk.signer.EncryptionCallback
+import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
 
 class SimpleAsymmetricProtection : KeyProtection() {
 
@@ -10,12 +13,12 @@ class SimpleAsymmetricProtection : KeyProtection() {
     override
     fun genKey(context: Context) {
 
-        generateKey(alias)
+        generateWrappingKey(context, alias)
 
     }
 
     override
-    fun encrypt(context: Context, purpose: String, blob: ByteArray, callback: (err: Exception?, ciphertext: String) -> Unit) {
+    fun encrypt(context: Context, purpose: String, blob: ByteArray, callback: EncryptionCallback) {
         try {
             val ciphertext = encryptRaw(blob, alias)
             callback(null, ciphertext)
@@ -26,7 +29,7 @@ class SimpleAsymmetricProtection : KeyProtection() {
 
 
     override
-    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: (err: Exception?, cleartext: ByteArray) -> Unit) {
+    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
         try {
             val decryptedBytes = decryptRaw(ciphertext, alias)
             callback(null, decryptedBytes)

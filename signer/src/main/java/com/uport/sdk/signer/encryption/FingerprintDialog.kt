@@ -1,9 +1,11 @@
 package com.uport.sdk.signer.encryption
 
 import android.animation.Animator
+import android.annotation.TargetApi
 import android.app.DialogFragment
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
+import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.view.LayoutInflater
@@ -15,6 +17,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.uport.sdk.signer.R
 
+@TargetApi(Build.VERSION_CODES.M)
 class FingerprintDialog : DialogFragment() {
 
     private lateinit var fingerprintManager: FingerprintManager
@@ -23,6 +26,7 @@ class FingerprintDialog : DialogFragment() {
     private lateinit var callbacks: FingerprintDialogCallbacks
     private lateinit var purpose: String
 
+    private lateinit var purposeTextView: TextView
     private lateinit var imageViewStatus: ImageView
     private lateinit var textViewStatus: TextView
     private lateinit var cancelButton: View
@@ -36,7 +40,7 @@ class FingerprintDialog : DialogFragment() {
 
         retainInstance = true
 
-        purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE) ?: ""
+        purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE) ?: arguments?.getString(KEY_DIALOG_PURPOSE) ?: ""
 
         fingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
         successColor = context.getColor(R.color.uport_fingerprint_green)
@@ -74,12 +78,13 @@ class FingerprintDialog : DialogFragment() {
     fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val content = inflater.inflate(R.layout.fragment_fingerprint, container)
 
-        dialog.setTitle(purpose)
+        purposeTextView = content.findViewById(R.id.purpose)
+        purposeTextView.text = purpose
         imageViewStatus = content.findViewById(R.id.imageViewFingerprintStatus)
         textViewStatus = content.findViewById(R.id.textViewFingerprintStatus)
         cancelButton = content.findViewById(R.id.buttonFingerprintCancel)
 
-        cancelButton.setOnClickListener({ _ -> onCancelPressed() })
+        cancelButton.setOnClickListener { _ -> onCancelPressed() }
 
         return content
     }

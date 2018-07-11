@@ -8,8 +8,9 @@ import com.uport.sdk.signer.encryption.KeyProtection
 import com.uport.sdk.signer.encryption.KeyProtectionFactory
 import com.uport.sdk.signer.encryption.SimpleAsymmetricProtection
 import org.kethereum.crypto.ECKeyPair
-import org.kethereum.crypto.Keys
-import org.kethereum.crypto.Keys.PUBLIC_KEY_SIZE
+import org.kethereum.crypto.PUBLIC_KEY_SIZE
+import org.kethereum.crypto.createEcKeyPair
+import org.kethereum.crypto.getAddress
 import org.kethereum.crypto.signMessage
 import org.kethereum.crypto.signMessageHash
 import org.kethereum.hashes.sha256
@@ -59,7 +60,7 @@ open class UportSigner {
     fun createKey(context: Context, level: KeyProtection.Level, callback: (err: Exception?, address: String, pubKey: String) -> Unit) {
 
         val privateKeyBytes = try {
-            val (privKey, _) = Keys.createEcKeyPair()
+            val (privKey, _) = createEcKeyPair()
             privKey.toByteArray()
         } catch (exception: Exception) {
             return callback(KeyException("ERR_CREATING_KEYPAIR", exception), "", "")
@@ -80,25 +81,25 @@ open class UportSigner {
 
         val publicKeyBytes = keyPair.getUncompressedPublicKeyWithPrefix()
         val publicKeyString = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
-        val address: String = Keys.getAddress(keyPair).prepend0xPrefix()
+        val address: String = keyPair.getAddress().prepend0xPrefix()
 
         val label = asAddressLabel(address)
 
         storeEncryptedPayload(context,
                 level,
                 label,
-                privateKeyBytes,
-                { err, _ ->
+                privateKeyBytes
+        ) { err, _ ->
 
-                    //empty memory
-                    privateKeyBytes.fill(0)
+            //empty memory
+            privateKeyBytes.fill(0)
 
-                    if (err != null) {
-                        return@storeEncryptedPayload callback(err, "", "")
-                    }
+            if (err != null) {
+                return@storeEncryptedPayload callback(err, "", "")
+            }
 
-                    return@storeEncryptedPayload callback(null, address, publicKeyString)
-                })
+            return@storeEncryptedPayload callback(null, address, publicKeyString)
+        }
     }
 
 //    private fun deleteKey(context: Context, address: String) {
@@ -131,10 +132,10 @@ open class UportSigner {
         val (encryptionLayer, encryptedPrivateKey, storageError) = getEncryptionForLabel(context, asAddressLabel(address))
 
         if (storageError != null) {
-            return callback(storageError, Companion.EMPTY_SIGNATURE_DATA)
+            return callback(storageError, EMPTY_SIGNATURE_DATA)
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey, { err, privateKey ->
+        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey) { err, privateKey ->
 
             if (err != null) {
                 return@decrypt callback(err, EMPTY_SIGNATURE_DATA)
@@ -146,14 +147,14 @@ open class UportSigner {
 
                 val txBytes = Base64.decode(txPayload, Base64.DEFAULT)
 
-                val sigData = signMessage(txBytes, keyPair)
+                val sigData = keyPair.signMessage(txBytes)
                 return@decrypt callback(null, sigData)
 
             } catch (exception: Exception) {
                 return@decrypt callback(exception, EMPTY_SIGNATURE_DATA)
             }
 
-        })
+        }
 
     }
 
@@ -213,7 +214,7 @@ open class UportSigner {
             return callback(storageError, SignatureData())
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey, { err, privateKey ->
+        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey) { err, privateKey ->
             if (err != null) {
                 return@decrypt callback(err, SignatureData())
             }
@@ -228,7 +229,7 @@ open class UportSigner {
             } catch (exception: Exception) {
                 return@decrypt callback(err, SignatureData())
             }
-        })
+        }
     }
 
     internal fun signJwt(payloadBytes: ByteArray, keyPair: ECKeyPair) = signMessageHash(payloadBytes.sha256(), keyPair, false)
@@ -241,8 +242,8 @@ open class UportSigner {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
         //list all stored keys, keep a list off what looks like addresses
         val addresses = prefs.all.keys
-                .filter({ label -> label.startsWith(ADDRESS_PREFIX) })
-                .filter({ hasCorrespondingLevelKey(prefs, it) })
+                .filter { label -> label.startsWith(ADDRESS_PREFIX) }
+                .filter { hasCorrespondingLevelKey(prefs, it) }
                 .map { label: String -> label.substring(ADDRESS_PREFIX.length) }
         callback(addresses)
     }
@@ -269,21 +270,20 @@ open class UportSigner {
             encLayer.encrypt(
                     context,
                     "store encrypted payload",
-                    payload,
-                    { err, ciphertext ->
+                    payload
+            ) { err, ciphertext ->
 
-                        if (err != null) {
-                            return@encrypt callback(err, false)
-                        }
-                        prefs.edit()
-                                //store encrypted privatekey
-                                .putString(label, ciphertext)
-                                //mark the key as encrypted with provided security level
-                                .putString(asLevelLabel(label), keyLevel.name)
-                                .apply()
-                        return@encrypt callback(null, true)
-                    }
-            )
+                if (err != null) {
+                    return@encrypt callback(err, false)
+                }
+                prefs.edit()
+                        //store encrypted privatekey
+                        .putString(label, ciphertext)
+                        //mark the key as encrypted with provided security level
+                        .putString(asLevelLabel(label), keyLevel.name)
+                        .apply()
+                return@encrypt callback(null, true)
+            }
         } catch (ex: Exception) {
             return callback(ex, false)
         }
@@ -314,13 +314,13 @@ open class UportSigner {
         }
 
         //decrypt using the appropriate level
-        encryptionLayer.decrypt(context, prompt, encryptedPayload, { err, decrypted ->
+        encryptionLayer.decrypt(context, prompt, encryptedPayload) { err, decrypted ->
             if (err != null) {
                 return@decrypt callback(err, ByteArray(0))
             }
 
             return@decrypt callback(null, decrypted)
-        })
+        }
     }
 
     companion object {
@@ -337,11 +337,28 @@ open class UportSigner {
 
         val hasCorrespondingLevelKey = { prefs: SharedPreferences, label: String -> prefs.contains(asLevelLabel(label)) }
 
+        /**
+         * This is thrown by KeyguardProtection when the user has not configured any device security.
+         * Prompt the user to setup PIN / Pattern / Password protection for their device.
+         * You can use Intent(Settings.ACTION_SECURITY_SETTINGS) to lead them to Android Settings -> Security tab
+         */
+        const val ERR_KEYGUARD_NOT_CONFIGURED = "E_KEYGUARD_NOT_CONFIGURED"
+
+        /**
+         * Thrown when trying to encrypt/decrypt something with a key that is not registered
+         */
         const val ERR_KEY_NOT_REGISTERED = "E_KEY_NOT_REGISTERED"
         const val ERR_KEY_CORRUPTED = "E_KEY_CORRUPTED"
         const val ERR_BLANK_KEY = "E_BLANK_KEY"
         const val ERR_ENCODING_ERROR = "E_ENCODING_PROBLEM"
         const val ERR_AUTH_CANCELED = "E_AUTH_CANCELED"
+
+        /**
+         * Thrown when the [KeyProtection.Level] requested is [KeyProtection.Level.SINGLE_PROMPT] or [KeyProtection.Level.PROMPT]
+         * but the requested operation is being performed outside an activity context.
+         *
+         * For signing stuff with these protection levels, an activity is needed to launch the proper UI.
+         */
         const val ERR_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST"
 
         const val UNCOMPRESSED_PUBLIC_KEY_SIZE = PUBLIC_KEY_SIZE + 1

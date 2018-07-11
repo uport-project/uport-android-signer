@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,9 +20,9 @@ class ProtectedSharedPreferencesTest {
 
     @Before
     fun before() {
-        context = InstrumentationRegistry.getContext()
+        context = InstrumentationRegistry.getTargetContext()
         val basePrefs = context.getSharedPreferences("test_prefs", MODE_PRIVATE)
-        prefs = ProtectedSharedPreferences(basePrefs)
+        prefs = ProtectedSharedPreferences(context, basePrefs)
     }
 
     @Test
@@ -223,7 +226,7 @@ class ProtectedSharedPreferencesTest {
 
     @Test
     fun clearsUnencryptedData() {
-        val originalPrefs = InstrumentationRegistry.getContext().getSharedPreferences("dummy", MODE_PRIVATE)
+        val originalPrefs = context.getSharedPreferences("dummy", MODE_PRIVATE)
         originalPrefs.edit()
                 .putBoolean("b_bla", true)
                 .putString("s_bla", "hello")
@@ -233,7 +236,7 @@ class ProtectedSharedPreferencesTest {
                 .putStringSet("set_bla", setOf("hello", "world", "!"))
                 .apply()
 
-        val wrappedPrefs = ProtectedSharedPreferences(originalPrefs)
+        val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 
         setOf("b", "s", "f", "l", "i", "set").forEach {
             assertFalse(originalPrefs.contains("${it}_bla"))
@@ -244,9 +247,9 @@ class ProtectedSharedPreferencesTest {
 
     @Test
     fun clearsUnreadableDataOnContains() {
-        val originalPrefs = InstrumentationRegistry.getContext().getSharedPreferences("unreadable", MODE_PRIVATE)
+        val originalPrefs = context.getSharedPreferences("unreadable", MODE_PRIVATE)
 
-        val wrappedPrefs = ProtectedSharedPreferences(originalPrefs)
+        val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 
         //force some prefix collisions to make decryption fail
         originalPrefs.edit()
@@ -273,7 +276,7 @@ class ProtectedSharedPreferencesTest {
     fun returnsDefaultsWhenDecryptionFails() {
         val originalPrefs = InstrumentationRegistry.getContext().getSharedPreferences("defaultable", MODE_PRIVATE)
 
-        val wrappedPrefs = ProtectedSharedPreferences(originalPrefs)
+        val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 
         //force some prefix collisions to make decryption fail
         originalPrefs.edit()
@@ -332,5 +335,15 @@ class ProtectedSharedPreferencesTest {
         assertEquals(value, prefs.getStringSet(key, null))
 
         assertEquals("whatever", prefs.getString(key, "whatever"))
+    }
+
+    @Test
+    fun canStoreBigString() {
+        val key = "long piece of string"
+        val value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et nisi metus. Proin enim urna, molestie nec quam id, efficitur laoreet sem. Ut hendrerit ac lectus at euismod. Donec cursus, metus quis gravida accumsan, orci ipsum efficitur ex, vitae ullamcorper turpis nibh id velit. Morbi nec tincidunt massa. Pellentesque accumsan sapien tristique felis molestie euismod. Ut sit amet rutrum mauris, eu tristique risus. Ut vitae quam id lectus scelerisque auctor. Sed arcu magna, egestas ut orci eget, imperdiet fermentum orci. Donec posuere mauris ante, et suscipit dolor posuere sit amet. Sed viverra laoreet pellentesque. Mauris neque risus, aliquam ut ultrices sed, laoreet a erat. Integer fringilla felis nec metus interdum, ac pellentesque dolor consequat. Nulla eros elit, commodo eget dolor sed, bibendum blandit elit. Duis arcu dolor, dignissim et diam ac, tempus ullamcorper mi. Nulla non lacus neque. Duis eget ex magna. Curabitur viverra volutpat massa eget vulputate. Nam elementum urna eu ante luctus, et aliquet tellus imperdiet. Cras pulvinar metus eget eros pretium, nec ullamcorper ipsum vestibulum. Praesent porttitor, dolor ac feugiat ultricies, dui libero tincidunt ex, in semper tellus massa pretium quam. Nulla sollicitudin pharetra massa, at scelerisque libero luctus sed. Proin sit amet lacus vel nunc molestie sollicitudin. Aliquam dolor lorem, rutrum vel cursus sit amet, vestibulum et lorem. Morbi lacinia erat id diam venenatis rutrum. Quisque interdum lectus id augue vestibulum congue. Cras libero ipsum, congue consectetur tellus sit amet, tincidunt pulvinar ligula. Duis finibus mauris ac orci ultrices lacinia. Sed interdum sodales commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus eu nibh neque. Cras viverra malesuada odio a volutpat. Fusce tincidunt felis id dolor volutpat sodales. Praesent purus lectus, maximus in finibus facilisis, finibus eu dui. Donec porta, felis id condimentum ullamcorper, mauris nisi consectetur leo, quis consectetur est velit id mi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat purus lectus, id volutpat mauris auctor in. Nam ultricies lectus rutrum leo blandit, nec condimentum felis efficitur. Phasellus non tincidunt tellus. Suspendisse potenti. Etiam ac est risus. Nullam eget augue diam. Pellentesque sed molestie ligula. Mauris justo elit, elementum eget massa efficitur, vehicula sodales ante. Fusce eu lobortis mi. Nunc sed lectus nec dolor ultrices vehicula. Sed ut nisl molestie, ultrices ligula eget, consectetur sem. Maecenas erat elit, facilisis ac luctus ac, congue in libero. Nulla in congue odio. Proin pretium mattis erat a ultricies. Mauris velit justo, fringilla non sapien vel, blandit eleifend sapien. Donec eu dignissim erat. Nam vel efficitur turpis, non congue justo. Maecenas id lectus sapien. Vivamus aliquet ultrices molestie. Sed volutpat dolor quis nunc euismod gravida. Phasellus ut suscipit nibh, at scelerisque tellus. Donec tincidunt lectus eleifend lectus maximus, vitae rutrum sapien hendrerit. Nunc bibendum et augue in gravida. Duis viverra, nisi vel imperdiet dapibus, nulla massa mollis libero, a viverra magna augue nec dolor. Integer vehicula augue vitae nisl eleifend venenatis. Nunc vestibulum leo at hendrerit iaculis. Donec vulputate maximus neque. Fusce accumsan varius semper. Quisque ante enim, interdum in odio id, posuere rutrum mi. Quisque ultricies mollis viverra. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla finibus est mi, at rutrum ipsum posuere eu. Ut feugiat elementum pharetra. Nullam mollis ipsum quis lectus sodales aliquam. Duis odio massa, tempus eget tristique sed, vestibulum eget nunc. Sed volutpat venenatis suscipit. Sed placerat, risus cursus pharetra varius, sapien sapien pretium dui, in auctor lacus magna commodo libero. Donec feugiat, nibh sed egestas viverra, nibh justo suscipit tellus, id ornare velit lectus a nunc. Etiam ut magna in dolor molestie molestie in dapibus nulla. Mauris egestas ligula nec quam rhoncus efficitur eu sed."
+
+        prefs.edit().putString(key, value).apply()
+
+        assertEquals(value, prefs.getString(key, "not what I want"))
     }
 }

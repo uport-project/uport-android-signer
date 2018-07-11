@@ -1,25 +1,18 @@
 package com.uport.sdk.signer.storage
 
+import android.content.Context
 import android.content.SharedPreferences
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
-import com.uport.sdk.signer.packCiphertext
-import com.uport.sdk.signer.unpackCiphertext
-import java.security.KeyStore
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 
 /**
  * Meant to be an encrypted drop in replacement for [SharedPreferences]
  *
  * This class is NOT thread safe
  */
-class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : SharedPreferences {
+class ProtectedSharedPreferences(context: Context, internal val delegate: SharedPreferences) : SharedPreferences {
+
+    val crypto = CryptoUtil(context)
 
     init {
-        genKey()
         //encrypt all previously nonencrypted data
         delegate.all.entries
                 .filter { (k, v) -> k != null && v != null }
@@ -61,22 +54,22 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
 
         return allKeyPrefixes
                 .map { "$it:$key" }
-                .fold(false, { foundIt, queryKey ->
+                .fold(false) { foundIt, queryKey ->
                     foundIt or (delegate.contains(queryKey) and canDecrypt(queryKey))
-                })
+                }
     }
 
     private fun canDecrypt(queryKey: String): Boolean {
         return try {
             if (queryKey.matches("^e:.*".toRegex())) {
                 val set = delegate.getStringSet(queryKey, mutableSetOf(/*nothing*/))
-                set.forEach { decrypt(it) }
+                set.forEach { crypto.decrypt(it) }
             } else {
-                decrypt(delegate.getString(queryKey, ""))
+                crypto.decrypt(delegate.getString(queryKey, ""))
             }
             true
         } catch (ex: Exception) {
-            System.out.println("removing key: $queryKey because it can't be decrypted")
+            //"removing key: $queryKey because it can't be decrypted"
             delegate.edit().remove(queryKey).apply()
             false
         }
@@ -91,7 +84,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
         }
 
         val decryptedBytes = try {
-            decrypt(delegate.getString(queryKey, ""))
+            crypto.decrypt(delegate.getString(queryKey, ""))
         } catch (ex: Exception) {
             delegate.edit().remove(queryKey).apply()
             return default
@@ -108,7 +101,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
             return default
         }
         val decryptedBytes = try {
-            decrypt(delegate.getString(queryKey, ""))
+            crypto.decrypt(delegate.getString(queryKey, ""))
         } catch (ex: Exception) {
             delegate.edit().remove(queryKey).apply()
             return default
@@ -125,7 +118,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
         }
 
         val decryptedBytes = try {
-            decrypt(delegate.getString(queryKey, ""))
+            crypto.decrypt(delegate.getString(queryKey, ""))
         } catch (ex: Exception) {
             delegate.edit().remove(queryKey).apply()
             return default
@@ -142,7 +135,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
         }
 
         val decryptedBytes = try {
-            decrypt(delegate.getString(queryKey, ""))
+            crypto.decrypt(delegate.getString(queryKey, ""))
         } catch (ex: Exception) {
             delegate.edit().remove(queryKey).apply()
             return default
@@ -159,7 +152,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
         }
 
         val decryptedBytes = try {
-            decrypt(delegate.getString(queryKey, ""))
+            crypto.decrypt(delegate.getString(queryKey, ""))
         } catch (ex: Exception) {
             delegate.edit().remove(queryKey).apply()
             return default
@@ -179,7 +172,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
 
         return try {
             encryptedValues
-                    .map { decrypt(it) }
+                    .map { crypto.decrypt(it) }
                     .map { String(it) }
                     .toMutableSet()
         } catch (ex: Exception) {
@@ -189,7 +182,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
     }
 
     override fun edit(): SharedPreferences.Editor {
-        return EncryptedEditor(delegate.edit())
+        return EncryptedEditor(delegate.edit(), crypto)
     }
 
     override fun getAll(): MutableMap<String?, Any?> {
@@ -229,7 +222,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
         delegate.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
-    class EncryptedEditor(private var delegate: SharedPreferences.Editor) : SharedPreferences.Editor {
+    class EncryptedEditor(private var delegate: SharedPreferences.Editor, val crypto: CryptoUtil) : SharedPreferences.Editor {
 
         override fun clear(): SharedPreferences.Editor {
             delegate.clear()
@@ -240,7 +233,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
             if (key == null)
                 return this
 
-            val encryptedValue = encrypt(value.toString().toByteArray())
+            val encryptedValue = crypto.encrypt(value.toString().toByteArray())
             delegate.putString("$typePrefix:$key", encryptedValue)
             return this
         }
@@ -257,9 +250,9 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
 
             allKeyPrefixes
                     .map { "$it:$key" }
-                    .forEach({
+                    .forEach {
                         delegate.remove(it)
-                    })
+                    }
 
             return this
         }
@@ -274,7 +267,7 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
             val queryKey = "e:$key"
 
             val encryptedValues = valueSet
-                    .map { encrypt(it.toByteArray()) }
+                    .map { crypto.encrypt(it.toByteArray()) }
                     .toMutableSet()
 
             return delegate.putStringSet(queryKey, encryptedValues)
@@ -304,68 +297,6 @@ class ProtectedSharedPreferences(internal val delegate: SharedPreferences) : Sha
         //there is a lot of space for collision with such short prefixes
         //TODO: use longer prefixes
         internal val allKeyPrefixes = listOf("b", "s", "i", "l", "f", "e")
-
-        private const val keyAlias = "simple_protection_key_alias"
-        private const val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
-        private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
-        private const val BLOCK_PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
-
-        private const val AES_TRANSFORMATION = "${KeyProperties.KEY_ALGORITHM_AES}/$BLOCK_MODE/$BLOCK_PADDING"
-
-        fun genKey() {
-
-            val keyStore = getKeyStore()
-
-            val secretKey = keyStore.getKey(keyAlias, null) as SecretKey?
-            if (secretKey == null) {
-
-                val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE_PROVIDER)
-                val purpose = KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                val builder = KeyGenParameterSpec.Builder(keyAlias, purpose)
-
-                builder.setBlockModes(BLOCK_MODE)
-                        .setKeySize(256)
-                        .setEncryptionPaddings(BLOCK_PADDING)
-
-                keyGenerator.init(builder.build())
-
-                keyGenerator.generateKey()
-            }
-        }
-
-        private fun getKeyStore(): KeyStore {
-            val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_PROVIDER)
-            keyStore.load(null)
-            return keyStore
-        }
-
-        fun encrypt(blob: ByteArray): String {
-            val keyStore = getKeyStore()
-
-            val cipher = Cipher.getInstance(AES_TRANSFORMATION)
-
-            val secretKey = keyStore.getKey(keyAlias, null) as SecretKey
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-
-            val encryptedBytes = cipher.doFinal(blob)
-
-            return Pair<ByteArray, ByteArray>(cipher.iv, encryptedBytes).packCiphertext()
-        }
-
-        fun decrypt(ciphertext: String): ByteArray {
-
-            val keyStore = getKeyStore()
-
-            val secretKey = keyStore.getKey(keyAlias, null) as SecretKey
-            val cipher = Cipher.getInstance(AES_TRANSFORMATION)
-
-            val (iv, encryptedBytes) = ciphertext.unpackCiphertext()
-
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
-
-            return cipher.doFinal(encryptedBytes)
-        }
-
 
     }
 
