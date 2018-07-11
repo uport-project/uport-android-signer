@@ -26,6 +26,7 @@ class FingerprintDialog : DialogFragment() {
     private lateinit var callbacks: FingerprintDialogCallbacks
     private lateinit var purpose: String
 
+    private lateinit var purposeTextView: TextView
     private lateinit var imageViewStatus: ImageView
     private lateinit var textViewStatus: TextView
     private lateinit var cancelButton: View
@@ -39,7 +40,7 @@ class FingerprintDialog : DialogFragment() {
 
         retainInstance = true
 
-        purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE) ?: ""
+        purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE) ?: arguments?.getString(KEY_DIALOG_PURPOSE) ?: ""
 
         fingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
         successColor = context.getColor(R.color.uport_fingerprint_green)
@@ -77,7 +78,8 @@ class FingerprintDialog : DialogFragment() {
     fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val content = inflater.inflate(R.layout.fragment_fingerprint, container)
 
-        dialog.setTitle(purpose)
+        purposeTextView = content.findViewById(R.id.purpose)
+        purposeTextView.text = purpose
         imageViewStatus = content.findViewById(R.id.imageViewFingerprintStatus)
         textViewStatus = content.findViewById(R.id.textViewFingerprintStatus)
         cancelButton = content.findViewById(R.id.buttonFingerprintCancel)

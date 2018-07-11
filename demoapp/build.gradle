@@ -37,7 +37,6 @@ dependencies {
     implementation "com.github.walleth.kethereum:bip39:$kethereum_version"
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation("junit:junit:$junit_version")
             { exclude group: 'com.squareup.okio', module: 'okio' }
 

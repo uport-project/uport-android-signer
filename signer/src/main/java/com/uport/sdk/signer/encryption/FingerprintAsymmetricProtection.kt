@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
+import android.support.v4.app.DialogFragment
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.DecryptionCallback
 import com.uport.sdk.signer.EncryptionCallback
+import com.uport.sdk.signer.R
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
@@ -69,6 +71,8 @@ class FingerprintAsymmetricProtection : KeyProtection() {
     private fun showFingerprintDialog(activity: Activity, purpose: String, cipher: Cipher, callback: (err: Exception?, FingerprintManager.CryptoObject) -> Unit) {
 
         fingerprintDialog = FingerprintDialog.create(purpose)
+        fingerprintDialog.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.uport_AppDialogTheme)
+
         if (activity.fragmentManager.findFragmentByTag(FingerprintDialog.TAG_FINGERPRINT_DIALOG) == null) {
             val cryptoObject = FingerprintManager.CryptoObject(cipher)
             fingerprintDialog.init(

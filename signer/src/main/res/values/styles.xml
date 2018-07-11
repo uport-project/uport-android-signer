@@ -1,12 +1,7 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="uport_AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:dialogTheme">@style/uport_AppDialogTheme</item>
-    </style>
-
     <style name="uport_AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
