@@ -55,7 +55,7 @@ object AndroidKeyStoreHelper {
      */
     private val WRAPPING_TRANSFORMATION =
             if (hasMarshmallow())
-                "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"
+                "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
             else
                 "RSA/ECB/PKCS1Padding"
 
