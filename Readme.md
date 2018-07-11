@@ -28,7 +28,7 @@ in your app `build.gradle`:
 ```groovy
 dependencies {
     ...
-    implementation "com.github.uport-project:uport-android-signer:0.1.1"
+    implementation "com.github.uport-project:uport-android-signer:0.2.0"
 }
 ```
 
@@ -49,6 +49,10 @@ The options are:
 * SINGLE_PROMPT - uses android lockscreen to confirm user authentication
             only if the user has not authenticated in the last 30 seconds.
 * CLOUD - reserved/unused - defaults to SIMPLE
+
+> #### Important notes:
+> * On KitKat, all `KeyProtection.Level` options default to `SIMPLE`
+> * On Lolipop, the 30 second timeout window for `SINGLE_PROMPT` is not enforced by the AndroidKeyStore API, it is emulated by this library 
 
 #### Create a seed:
 
@@ -141,3 +145,20 @@ UportHDSigner().signJwtBundle(activity, rootAddress, derivationPath, data, promp
 })
 
 ```
+
+
+### Changelog
+
+#### v0.2.0
+    * lowered minSDK requirements to 19
+        All eth keys and seeds are encrypted with RSA provided by the AndroidKeyStore API, but before SDK 23 that API does not enforce user authentication at runtime so the Keyguard requirement is emulated on Lolipop and not possible on KitKat
+    * no longer depending on all of kethereum, only using the `crypto` and `bip39` libraries
+    * no longer forwarding the kethereum API to integrating modules.
+        If you were depending on that, please add a direct dependency to kethereum.
+    * also, updated the kethereum dependency to v0.53. If you were depending on an older version, you need to update too
+        
+#### v0.1.1
+    * to make the `v` recovery param available to calling classes, JWT signing produces `SignatureData` instead of a JOSE encoded signature String
+    
+#### v0.0.1
+    * initial release
