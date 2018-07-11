@@ -1,13 +1,21 @@
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
+import android.os.Build
+import android.os.Build.VERSION_CODES.LOLLIPOP
 
 object KeyProtectionFactory {
 
     fun obtain(context: Context, level: KeyProtection.Level): KeyProtection {
 
-        //FIXME: this needs more love; some checks need to be performed before attempting secure storage
-        val store = when (level) {
+        val apiAdjustedLevel = if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+            level
+        } else {
+            //only simple protection is available for KitKat
+            KeyProtection.Level.SIMPLE
+        }
+
+        val store = when (apiAdjustedLevel) {
 
             KeyProtection.Level.SINGLE_PROMPT -> {
                 KeyguardAsymmetricProtection()
@@ -18,7 +26,22 @@ object KeyProtectionFactory {
                 if (KeyProtection.hasSetupFingerprint(context)) {
                     FingerprintAsymmetricProtection()
                 } else {
-                    KeyguardAsymmetricProtection(1)
+                    val sessionTime = if (KeyProtection.hasFingerprintHardware(context)) {
+                        0 // pop keyguard with 0 second authentication window (practically for every use)
+
+                        /**
+                         * reason for this behavior:
+                         *
+                         * on devices that have fingerprint hardware but haven't setup fingerprints
+                         * an IllegalBlockSizeException is thrown if the requested session time is "-1"
+                         * with the cause being KeyStoreException("Key user not authenticated")
+                         *
+                         * Therefore, we emulate this by a 0 second authentication window
+                         */
+                    } else {
+                        -1 // pop keyguard for every use
+                    }
+                    KeyguardAsymmetricProtection(sessionTime)
                 }
             }
 

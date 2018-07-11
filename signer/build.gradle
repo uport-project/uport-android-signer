@@ -14,10 +14,12 @@ android {
         versionCode 1
         versionName "1.0"
 
-        multiDexEnabled true
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        testApplicationId "com.uport.sdk.signer.test"
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -27,23 +29,24 @@ android {
         }
     }
 
-    dexOptions {
-        jumboMode true
+    testOptions {
+        animationsDisabled = true
+//        execution 'ANDROID_TEST_ORCHESTRATOR'
     }
 
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$support_lib_version"
 
-    api "com.github.walleth:kethereum:$kethereum_version"
+    implementation "com.github.walleth.kethereum:crypto:$kethereum_version"
+    implementation "com.github.walleth.kethereum:bip39:$kethereum_version"
 
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
-    androidTestImplementation "com.android.support.test:rules:$test_runner_version"
-//    androidTestImplementation("com.android.support.test.espresso:espresso-core:$espresso_version", {
-//        exclude group: "com.android.support", module: "support-annotations"
-//    })
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    androidTestImplementation "com.android.support.test:rules:$test_rules_version"
+//    androidTestUtil "com.android.support.test:orchestrator:$test_orchestrator_version"
+
 
 }
 repositories {

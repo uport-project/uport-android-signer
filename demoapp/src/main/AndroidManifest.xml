@@ -11,11 +11,10 @@
         <activity
             android:name=".CreateKeysActivity"
             android:label="@string/title_activity_create_keys"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity android:name=".UseKeysActivity"
-            android:label="@string/title_activity_use_keys"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".UseKeysActivity"
+            android:label="@string/title_activity_use_keys" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
@@ -26,6 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PinGuardedKeyActivity" />
+        <activity android:name=".FingerprintGuardedKeyActivity" />
     </application>
 
 </manifest>

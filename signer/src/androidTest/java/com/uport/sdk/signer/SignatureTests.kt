@@ -1,14 +1,17 @@
 package com.uport.sdk.signer
 
 import android.support.test.InstrumentationRegistry
+import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import com.uport.sdk.signer.encryption.KeyProtection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.spongycastle.util.encoders.Hex
 import java.util.concurrent.CountDownLatch
 
+@RunWith(AndroidJUnit4::class)
 class SignatureTests {
 
     @Test
@@ -33,7 +36,7 @@ class SignatureTests {
             val refSigR = it.txSig.r
             val refSigS = it.txSig.s
 
-            signer.saveKey(context, KeyProtection.Level.SIMPLE, privKeyBytes, { err, address, pubKey ->
+            signer.saveKey(context, KeyProtection.Level.SIMPLE, privKeyBytes) { err, address, pubKey ->
 
                 assertNull(err)
 
@@ -41,21 +44,21 @@ class SignatureTests {
 
                 assertEquals(refPublicKey, pubKey)
 
-                UportSigner().signJwtBundle(context, address, refJwtMessage, "", { signerErr, sig ->
+                UportSigner().signJwtBundle(context, address, refJwtMessage, "") { signerErr, sig ->
                     assertNull(signerErr)
                     assertEquals(refJwtSignature, sig.getJoseEncoded())
                     latch.countDown()
-                })
+                }
 
-                UportSigner().signTransaction(context, address, refTxData, "", { signerErr, sig ->
+                UportSigner().signTransaction(context, address, refTxData, "") { signerErr, sig ->
                     assertNull(signerErr)
                     assertEquals(refSigV, sig.v)
                     assertEquals(refSigR, sig.r.keyToBase64())
                     assertEquals(refSigS, sig.s.keyToBase64())
                     latch.countDown()
-                })
+                }
 
-            })
+            }
 
             latch.await()
         }

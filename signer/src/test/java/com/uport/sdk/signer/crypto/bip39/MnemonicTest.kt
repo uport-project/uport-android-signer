@@ -1,6 +1,9 @@
 package com.uport.sdk.signer.crypto.bip39
 
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.kethereum.bip32.generateKey
