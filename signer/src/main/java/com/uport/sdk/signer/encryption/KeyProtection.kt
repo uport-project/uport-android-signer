@@ -104,7 +104,8 @@ abstract class KeyProtection {
 
             val encryptedBytes = cipher.doFinal(blob)
 
-            return packCiphertext(encryptedBytes)
+            val ivCompat = ByteArray(0)
+            return packCiphertext(ivCompat, encryptedBytes)
         }
 
         @Throws(IllegalBlockSizeException::class, BadPaddingException::class)
@@ -112,7 +113,7 @@ abstract class KeyProtection {
 
             val cipher = getWrappingCipher(DECRYPT_MODE, keyAlias)
 
-            val (encryptedBytes) = unpackCiphertext(ciphertext)
+            val (_, encryptedBytes) = unpackCiphertext(ciphertext)
 
             return cipher.doFinal(encryptedBytes)
         }
