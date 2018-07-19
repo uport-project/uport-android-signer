@@ -1,4 +1,4 @@
-package com.uport.sdk.signer
+package com.uport.sdk.signer.testutil
 
 import android.support.v7.app.AppCompatActivity
 
