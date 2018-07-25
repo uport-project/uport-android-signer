@@ -102,14 +102,17 @@ open class UportSigner {
         }
     }
 
-//    private fun deleteKey(context: Context, address: String) {
-//        val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
-//        val label = asAddressLabel(address)
-//        prefs.edit()
-//                .remove(label)
-//                .remove(asLevelLabel(label))
-//                .apply()
-//    }
+    /**
+     * deletes a key from storage
+     */
+    fun deleteKey(context: Context, address: String) {
+        val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
+        val label = asAddressLabel(address)
+        prefs.edit()
+                .remove(label)
+                .remove(asLevelLabel(label))
+                .apply()
+    }
 
     /**
      * Signs a transaction bundle using the private key that generated the given address.

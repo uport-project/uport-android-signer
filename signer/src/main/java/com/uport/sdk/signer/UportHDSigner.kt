@@ -92,6 +92,19 @@ class UportHDSigner : UportSigner() {
         }
     }
 
+    /**
+     * Deletes a seed from storage.
+     */
+    fun deleteSeed(context: Context, label: String) {
+        val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
+        prefs.edit()
+                //store encrypted privatekey
+                .remove(asSeedLabel(label))
+                //mark the key as encrypted with provided security level
+                .remove(asLevelLabel(label))
+                .apply()
+    }
+
 
     /**
      * Signs a transaction bundle using a key derived from a previously imported/created seed.
