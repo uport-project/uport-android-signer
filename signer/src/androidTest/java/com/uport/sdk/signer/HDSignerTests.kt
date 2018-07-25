@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
+import junit.framework.Assert.assertFalse
 import com.uport.sdk.signer.encryption.KeyProtection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -144,14 +145,34 @@ class HDSignerTests {
         latch.await()
     }
 
-    private fun ensureSeedIsImported(phrase: String) {
+    @Test
+    fun testDeleteSeed() {
+        val tested = UportHDSigner()
+
+        val referencePhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
+        val refRoot = ensureSeedIsImported(referencePhrase)
+
+        assertTrue(tested.allHDRoots(context).contains(refRoot))
+
+        tested.deleteSeed(context, refRoot)
+
+        assertFalse(tested.allHDRoots(context).contains(refRoot))
+    }
+
+
+    private fun ensureSeedIsImported(phrase: String) : String {
+
+        var ref = ""
         //ensure seed is imported
         val latch = CountDownLatch(1)
-        UportHDSigner().importHDSeed(context, KeyProtection.Level.SIMPLE, phrase) { err, _, _ ->
+        UportHDSigner().importHDSeed(context, KeyProtection.Level.SIMPLE, phrase) { err, rootAddr, _ ->
             assertNull(err)
+            ref = rootAddr
             latch.countDown()
         }
         latch.await()
+
+        return ref
     }
 
 }
