@@ -4,11 +4,13 @@ import android.content.Context
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
-import junit.framework.Assert.assertFalse
+import com.uport.sdk.signer.encryption.KeyProtection.Level.SIMPLE
+import com.uport.sdk.signer.testutil.ensureSeedIsImportedInTargetContext
 import com.uport.sdk.signer.encryption.KeyProtection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +43,7 @@ class HDSignerTests {
     fun testSeedCreationAndUsage() {
         val latch = CountDownLatch(1)
 
-        UportHDSigner().createHDSeed(context, KeyProtection.Level.SIMPLE) { err, rootAddress, pubKey ->
+        UportHDSigner().createHDSeed(context, SIMPLE) { err, rootAddress, pubKey ->
 
             assertNull(err)
 
@@ -66,7 +68,7 @@ class HDSignerTests {
         val referencePublicKey = "BFcWkA3uvBb9nSyJmk5rJgx69UtlGN0zwDiNx5TcVmENEUcvF2V26GYP9/3HNE/7vquemm45hDYEqr1/Nph9aIE="
 
         val latch = CountDownLatch(1)
-        UportHDSigner().importHDSeed(context, KeyProtection.Level.SIMPLE, referenceSeedPhrase) { err, address, pubKey ->
+        UportHDSigner().importHDSeed(context, SIMPLE, referenceSeedPhrase) { err, address, pubKey ->
 
             assertNull(err)
 
@@ -108,12 +110,12 @@ class HDSignerTests {
     @Test
     fun testSeedImportAndUsage() {
         val referenceSeedPhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
-        val referenceRootAddress = "0x794adde0672914159c1b77dd06d047904fe96ac8"
+        val referenceRootAddress = ensureSeedIsImportedInTargetContext(referenceSeedPhrase)
         val referenceSignature = "lnEso6Io2pJvlC6sWDLRkvxvpXqcUpZpvr4sdpHcTGA66Y1zher8KlrnWzQ2tt_lpxpx2YYdbfdtkfVmwjex2Q".decodeJose(28)
 
         val referencePayload = Base64.encodeToString("Hello world".toByteArray(), Base64.DEFAULT)
 
-        ensureSeedIsImported(referenceSeedPhrase)
+
 
         val latch = CountDownLatch(1)
 
@@ -131,9 +133,7 @@ class HDSignerTests {
     @Test
     fun checkShowSeed() {
         val referenceSeedPhrase = "idle giraffe soldier dignity angle tiger false finish busy glow ramp frog"
-        val referenceRootAddress = "0xd2bf228f4bf45a9a3d2247d27235e4c07ff0c275"
-
-        ensureSeedIsImported(referenceSeedPhrase)
+        val referenceRootAddress = ensureSeedIsImportedInTargetContext(referenceSeedPhrase)
 
         //check that retrieving it yields the same phrase
         val latch = CountDownLatch(1)
@@ -150,29 +150,13 @@ class HDSignerTests {
         val tested = UportHDSigner()
 
         val referencePhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
-        val refRoot = ensureSeedIsImported(referencePhrase)
+        val refRoot = ensureSeedIsImportedInTargetContext(referencePhrase)
 
         assertTrue(tested.allHDRoots(context).contains(refRoot))
 
         tested.deleteSeed(context, refRoot)
 
         assertFalse(tested.allHDRoots(context).contains(refRoot))
-    }
-
-
-    private fun ensureSeedIsImported(phrase: String) : String {
-
-        var ref = ""
-        //ensure seed is imported
-        val latch = CountDownLatch(1)
-        UportHDSigner().importHDSeed(context, KeyProtection.Level.SIMPLE, phrase) { err, rootAddr, _ ->
-            assertNull(err)
-            ref = rootAddr
-            latch.countDown()
-        }
-        latch.await()
-
-        return ref
     }
 
 }
