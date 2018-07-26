@@ -5,9 +5,7 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import com.uport.sdk.signer.encryption.KeyProtection
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -302,6 +300,33 @@ class SignerTests {
 
         assertTrue(storedAddressList.containsAll(addresses))
 
+    }
+
+    @Test
+    fun testDeleteKey() {
+        val referencePrivateKey = Hex.decode("5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38")
+
+        val tested = UportSigner()
+
+        var keyHandle = ""
+
+        var latch = CountDownLatch(1)
+        tested.saveKey(context, KeyProtection.Level.SIMPLE, referencePrivateKey) { err, addr, _ ->
+            assertNull(err)
+            keyHandle = addr
+            latch.countDown()
+        }
+        latch.await()
+
+        tested.deleteKey(context, keyHandle)
+
+        latch = CountDownLatch(1)
+        tested.allAddresses(context) { all ->
+            assertFalse(all.contains(keyHandle))
+            latch.countDown()
+        }
+
+        latch.await()
     }
 }
 

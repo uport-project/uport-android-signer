@@ -6,9 +6,11 @@ import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import com.uport.sdk.signer.encryption.KeyProtection.Level.SIMPLE
 import com.uport.sdk.signer.testutil.ensureSeedIsImportedInTargetContext
+import com.uport.sdk.signer.encryption.KeyProtection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -143,6 +145,18 @@ class HDSignerTests {
         latch.await()
     }
 
+    @Test
+    fun testDeleteSeed() {
+        val tested = UportHDSigner()
 
+        val referencePhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
+        val refRoot = ensureSeedIsImportedInTargetContext(referencePhrase)
+
+        assertTrue(tested.allHDRoots(context).contains(refRoot))
+
+        tested.deleteSeed(context, refRoot)
+
+        assertFalse(tested.allHDRoots(context).contains(refRoot))
+    }
 
 }

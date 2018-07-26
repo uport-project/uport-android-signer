@@ -138,4 +138,4 @@ class ExtendedKeyTest {
 
 }
 
-internal fun ExtendedKey.asPublicOnly(): ExtendedKey = this.copy(keyPair = ECKeyPair(BigInteger.ZERO, this.getKeyPair().publicKey))
+internal fun ExtendedKey.asPublicOnly(): ExtendedKey = this.copy(keyPair = ECKeyPair(BigInteger.ZERO, this.keyPair.publicKey))
