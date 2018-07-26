@@ -252,7 +252,7 @@ class UportHDSigner : UportSigner() {
 
         encryptionLayer.decrypt(context, prompt, encryptedEntropy) { err, entropyBuff ->
             if (err != null) {
-                return@decrypt callback(storageError, "")
+                return@decrypt callback(err, "")
             }
 
             try {
