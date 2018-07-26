@@ -24,11 +24,13 @@ allprojects {
 }
 ```
 
+[![](https://jitpack.io/v/uport-project/uport-android-signer.svg)](https://jitpack.io/#uport-project/uport-android-signer)
+
 in your app `build.gradle`:
 ```groovy
 dependencies {
     ...
-    implementation "com.github.uport-project:uport-android-signer:0.2.0"
+    implementation "com.github.uport-project:uport-android-signer:0.2.1"
 }
 ```
 
@@ -148,6 +150,10 @@ UportHDSigner().signJwtBundle(activity, rootAddress, derivationPath, data, promp
 
 
 ### Changelog
+
+#### v0.2.1
+    * [bugfix] incorrect exception when activity context was needed (#5)
+    * [feature] add functionality to delete keys/seeds (#8)
 
 #### v0.2.0
     * lowered minSDK requirements to 19
