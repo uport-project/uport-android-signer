@@ -30,7 +30,7 @@ in your app `build.gradle`:
 ```groovy
 dependencies {
     ...
-    implementation "com.github.uport-project:uport-android-signer:0.2.1"
+    implementation "com.github.uport-project:uport-android-signer:0.2.2"
 }
 ```
 
@@ -150,6 +150,9 @@ UportHDSigner().signJwtBundle(activity, rootAddress, derivationPath, data, promp
 
 
 ### Changelog
+
+#### v0.2.2
+    * [feature] enable recoverable signature in JOSE encoding (#11)
 
 #### v0.2.1
     * [bugfix] incorrect exception when activity context was needed (#5)
