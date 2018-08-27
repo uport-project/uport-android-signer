@@ -2,9 +2,10 @@ package me.uport.signer.demo
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Base64
 import com.uport.sdk.signer.UportHDSigner
 import com.uport.sdk.signer.encryption.KeyProtection
+import com.uport.sdk.signer.padBase64
+import com.uport.sdk.signer.toBase64
 import kotlinx.android.synthetic.main.activity_pin_guarded_key.*
 import java.util.*
 
@@ -40,7 +41,7 @@ class PinGuardedKeyActivity : AppCompatActivity() {
             val msgBytes = ByteArray(3139).also { Random().nextBytes(it) }
 
             //needs to be wrapped as a base64 string
-            val b64Payload = Base64.encodeToString(msgBytes, Base64.NO_WRAP)
+            val b64Payload = msgBytes.toBase64().padBase64()
 
             UportHDSigner().signTransaction(
                     this,
