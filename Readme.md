@@ -1,3 +1,7 @@
+## Signer library has moved to [uport-android-sdk](https://github.com/uport-project/uport-android-sdk)
+
+Please use that one directly. This repo is no longer maintained.
+
 ## Uport android signer
 
 This library is used to create and manage keys for uport account. 
@@ -30,7 +34,8 @@ in your app `build.gradle`:
 ```groovy
 dependencies {
     ...
-    implementation "com.github.uport-project:uport-android-signer:0.2.2"
+    ~~implementation "com.github.uport-project:uport-android-signer:0.2.2"~~
+    implementation "com.github.uport-project.uport-android-sdk:signer:$uport_sdk_version"
 }
 ```
 
@@ -150,6 +155,10 @@ UportHDSigner().signJwtBundle(activity, rootAddress, derivationPath, data, promp
 
 
 ### Changelog
+
+
+#### latest
+    * *the signer library has moved to [uport-android-sdk](https://github.com/uport-project/uport-android-sdk)*
 
 #### v0.2.2
     * [feature] enable recoverable signature in JOSE encoding (#11)
