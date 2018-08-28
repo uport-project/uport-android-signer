@@ -1,6 +1,6 @@
 ## Signer library has moved to [uport-android-sdk](https://github.com/uport-project/uport-android-sdk)
 
-Please use that one directly. This repo is no longer maintained.
+**Please use that one directly. This repo is no longer maintained.**
 
 ## Uport android signer
 
@@ -27,15 +27,11 @@ allprojects {
     }
 }
 ```
-
-[![](https://jitpack.io/v/uport-project/uport-android-signer.svg)](https://jitpack.io/#uport-project/uport-android-signer)
-
 in your app `build.gradle`:
 ```groovy
 uport_sdk_version = "v0.2.1"
 dependencies {
     ...
-    ~~implementation "com.github.uport-project:uport-android-signer:0.2.2"~~
     implementation "com.github.uport-project.uport-android-sdk:signer:$uport_sdk_version"
 }
 ```
