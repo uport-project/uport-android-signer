@@ -3,10 +3,10 @@ package me.uport.signer.demo
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.UportHDSigner
-import com.uport.sdk.signer.decodeBase64
 import com.uport.sdk.signer.encryption.KeyProtection
 import kotlinx.android.synthetic.main.activity_create_keys.*
 import kotlinx.android.synthetic.main.content_create_keys.*
+import me.uport.sdk.core.decodeBase64
 import org.kethereum.bip39.Mnemonic
 import org.walleth.khex.toHexString
 

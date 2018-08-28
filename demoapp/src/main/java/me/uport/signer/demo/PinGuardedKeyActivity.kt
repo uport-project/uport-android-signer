@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.UportHDSigner
 import com.uport.sdk.signer.encryption.KeyProtection
-import com.uport.sdk.signer.padBase64
-import com.uport.sdk.signer.toBase64
 import kotlinx.android.synthetic.main.activity_pin_guarded_key.*
+import me.uport.sdk.core.padBase64
+import me.uport.sdk.core.toBase64
 import java.util.*
 
 class PinGuardedKeyActivity : AppCompatActivity() {
@@ -57,7 +57,6 @@ class PinGuardedKeyActivity : AppCompatActivity() {
                 }
             }
         }
-
 
 
     }
