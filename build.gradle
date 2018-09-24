@@ -1,9 +1,9 @@
 buildscript {
     ext {
         kotlin_version = "1.2.61"
-        android_tools_version = "3.3.0-alpha07"
+        android_tools_version = '3.3.0-alpha11'
 
-        build_tools_version = "27.0.3"
+        build_tools_version = "28.0.2"
 
         min_sdk_version = 19
         compile_sdk_version = 27
@@ -20,7 +20,7 @@ buildscript {
         constraint_layout_version = "1.1.2"
 
         kethereum_version = "0.53"
-        uport_sdk_version = "v0.2.1"
+        uport_sdk_version = "v0.2.2"
     }
 
     repositories {
