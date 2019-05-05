@@ -1,7 +1,3 @@
-## Signer library has moved to [uport-android-sdk](https://github.com/uport-project/uport-android-sdk)
-
-**Please use that one directly. This repo is no longer maintained.**
-
 ## Uport android signer
 
 This library is used to create and manage keys for uport account. 
@@ -13,7 +9,7 @@ Where available, keys and seeds created by this lib will be protected by
 encryption backed by ARM Trusted Execution Environment (TEE).
 
 Note: The curve used for ETH signing is not backed by the TEE,
-therefore private keys exist in memory while in use but are encrypted with TEE keys while on storage.
+therefore private keys exist in memory while in use but are encrypted with TEE keys at rest.
 
 ### Import
 
@@ -22,17 +18,17 @@ in your main `build.gradle`:
 
 allprojects {
     repositories {
-        ...
+        //...
         maven { url 'https://jitpack.io' }
     }
 }
 ```
 in your app `build.gradle`:
 ```groovy
-uport_sdk_version = "v0.2.2"
+uport_signer_version = "v0.2.2"
 dependencies {
-    ...
-    implementation "com.github.uport-project.uport-android-sdk:signer:$uport_sdk_version"
+    //...
+    implementation "com.github.uport-project.uport-android-sdk:signer:$uport_signer_version"
 }
 ```
 
@@ -56,7 +52,8 @@ The options are:
 
 > #### Important notes:
 > * On KitKat, all `KeyProtection.Level` options default to `SIMPLE`
-> * On Lolipop, the 30 second timeout window for `SINGLE_PROMPT` is not enforced by the AndroidKeyStore API, it is emulated by this library 
+> * On Lolipop, the 30 second timeout window for `SINGLE_PROMPT` is not enforced by the 
+`AndroidKeyStore` API, it is emulated by this library 
 
 #### Create a seed:
 

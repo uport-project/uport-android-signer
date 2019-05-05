@@ -48,16 +48,17 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$support_lib_version"
     implementation "com.android.support:design:$support_lib_version"
 
-    //signer library is now part of the android sdk
-    implementation "com.github.uport-project.uport-android-sdk:signer:$uport_sdk_version"
+//    def uport_signer_version = "0.2.3"
+//    implementation "com.github.uport-project.uport-android-signer:signer:$uport_signer_version"
+    implementation project(":signer")
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
+
     testImplementation("junit:junit:$junit_version")
-            { exclude group: 'com.squareup.okio', module: 'okio' }
 
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_version"
