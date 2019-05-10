@@ -43,7 +43,7 @@ android {
 
 //XXX: this is needed until https://github.com/komputing/KEthereum/issues/65 is fixed
 configurations.all {
-    exclude group: "com.github.walleth", module: "sha3"
+    exclude group: "com.github.walleth"
 }
 
 dependencies {
@@ -53,7 +53,7 @@ dependencies {
 
     api "com.github.komputing.KEthereum:bip39:$kethereum_version"
     api "com.github.komputing.KEthereum:bip39_wordlist_en:$kethereum_version"
-    api "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
+    api "com.github.uport-project.kotlin-common:signer-common:$kotlin_common_version"
 
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test:rules:$test_rules_version"

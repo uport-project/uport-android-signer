@@ -4,12 +4,12 @@ import android.content.Context
 import android.support.test.InstrumentationRegistry
 import com.uport.sdk.signer.encryption.KeyProtection
 import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.core.decodeJose
-import me.uport.sdk.core.getDerEncoded
-import me.uport.sdk.core.getJoseEncoded
-import me.uport.sdk.core.getUncompressedPublicKeyWithPrefix
 import me.uport.sdk.core.padBase64
 import me.uport.sdk.core.toBase64
+import me.uport.sdk.signer.decodeJose
+import me.uport.sdk.signer.getDerEncoded
+import me.uport.sdk.signer.getJoseEncoded
+import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

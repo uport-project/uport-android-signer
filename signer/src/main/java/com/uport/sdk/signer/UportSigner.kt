@@ -11,7 +11,7 @@ import com.uport.sdk.signer.encryption.KeyProtection
 import com.uport.sdk.signer.encryption.KeyProtectionFactory
 import com.uport.sdk.signer.encryption.SimpleAsymmetricProtection
 import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.core.getUncompressedPublicKeyWithPrefix
+import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
 import me.uport.sdk.core.padBase64
 import me.uport.sdk.core.toBase64
 import org.kethereum.crypto.createEthereumKeyPair

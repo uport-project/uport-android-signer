@@ -2,8 +2,8 @@ package com.uport.sdk.signer
 
 import android.content.Context
 import com.uport.sdk.signer.UportHDSigner.Companion.UPORT_ROOT_DERIVATION_PATH
-import me.uport.sdk.core.Signer
 import me.uport.sdk.core.toBase64
+import me.uport.sdk.signer.Signer
 import org.kethereum.model.SignatureData
 
 /**

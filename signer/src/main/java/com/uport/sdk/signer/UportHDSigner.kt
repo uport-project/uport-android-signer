@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import com.uport.sdk.signer.encryption.KeyProtection
 import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.core.getUncompressedPublicKeyWithPrefix
 import me.uport.sdk.core.padBase64
 import me.uport.sdk.core.toBase64
+import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
 import org.kethereum.bip39.entropyToMnemonic
 import org.kethereum.bip39.mnemonicToEntropy
 import org.kethereum.bip39.model.MnemonicWords
