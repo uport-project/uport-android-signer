@@ -25,10 +25,10 @@ allprojects {
 ```
 in your app `build.gradle`:
 ```groovy
-uport_signer_version = "v0.2.2"
+uport_signer_version = "0.2.2"
 dependencies {
     //...
-    implementation "com.github.uport-project.uport-android-sdk:signer:$uport_signer_version"
+    implementation "com.github.uport-project.uport-android-signer:signer:$uport_signer_version"
 }
 ```
 
@@ -61,13 +61,13 @@ This creates a seed that is used for future key derivation and signing:
 The seed is representable by a bip39 mnemonic phrase.
 
 ```kotlin
-UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE, { err, rootAddress, publicKey ->
-                //seed has been created and is accessible using rootAddress 
-                // * the handle is `rootAddress`
-                // * the corresponding publicKey in base64 is `publicKey`
-                // * if there was an error, those are blank and the err object is non null
+UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE, { err, seedHandle, publicKey ->
+                //seed has been created and is accessible using seedHandle 
+                // * the handle is `seedHandle`
+                // * the corresponding publicKey in base64 encoding is `publicKey`
+                // * if there was an error, those are blank and the `err` object is non null
                 
-                // To use the seed, refer to it using this `rootAddress` 
+                // To use the seed, refer to it using this `seedHandle` 
             })
 ```
 
@@ -78,14 +78,14 @@ You can also import bip39 mnemonic phrases:
 //bip39 mnemonic phrase:
 val phrase = "vessel ladder alter ... glass valve picture"
 
-UportHDSigner().importHDSeed(activity, KeyProtection.Level.SIMPLE, phrase, { err, rootAddress, publicKey ->
+UportHDSigner().importHDSeed(activity, KeyProtection.Level.SIMPLE, phrase, { err, seedHandle, publicKey ->
 
                 if (err != null) {
                     //handle error
                 } else {
-                    assertEquals("0x794a...e96ac8", rootAddress)
+                    assertEquals("0x794a...e96ac8", seedHandle)
                     //seed has been imported and 
-                    // * the handle is `rootAddress`
+                    // * the handle is `seedHandle`
                     // * the corresponding publicKey in base64 is `publicKey`
                 }
                  
@@ -98,13 +98,13 @@ You can use this lib to calculate ETH transaction signatures.
 Building and encoding transaction objects into `ByteArray`s is not in the scope of this lib.
 
 You can sign transactions using keys derived from a previously imported seed.
-To refer to that seed you must use the `rootAddress` from the seed creation/import callback
+To refer to that seed you must use the `seedHandle` from the seed creation/import callback
 Based on the `KeyProtection.Level` used during seed import/creation, a prompt may be shown to the user
 on the lock-screen / fingerprint dialog.
 
 ```kotlin
 
-val rootAddress = "0x123..." //rootAddress received when creating/importing the seed
+val seedHandle = "0x123..." //seedHandle received when creating/importing the seed
 
 //bip32 key derivation
 val derivationPath = "m/44'/60'/0'/0/0"
@@ -115,7 +115,7 @@ val txPayloadB64 = Base64.encodeToString( transaction.rlpEncode(), Base64.DEFAUL
 //gets shown to the user on fingerprint dialog or on lockscreen, based on `KeyProtection.Level` used
 val prompt = "Please sign this transaction"
 
-UportHDSigner().signTransaction(activity, rootAddress, derivationPath, txPayloadB64, prompt, { err, sigData ->
+UportHDSigner().signTransaction(activity, seedHandle, derivationPath, txPayloadB64, prompt, { err, sigData ->
     if (err != null) {
         //handle error
     } else {
@@ -137,9 +137,9 @@ Also, do note that in the current version of this API,
 
 ```kotlin
 
-UportHDSigner().signJwtBundle(activity, rootAddress, derivationPath, data, prompt, { err, sigData ->
+UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt, { err, sigData ->
     if (err != null) {
-        //handle error
+        //process the error
     } else {
         //use sigData r,s,v components
     }
