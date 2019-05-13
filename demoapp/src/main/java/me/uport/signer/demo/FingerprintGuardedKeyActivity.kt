@@ -1,3 +1,5 @@
+@file:Suppress("SetTextI18n")
+
 package me.uport.signer.demo
 
 import android.os.Bundle
@@ -33,7 +35,7 @@ class FingerprintGuardedKeyActivity : AppCompatActivity() {
 
         createKeyBtn.setOnClickListener {
             //KeyProtection.Level.PROMPT will default to Keyguard when no fingerprints are available
-            UportHDSigner().createHDSeed(this, KeyProtection.Level.PROMPT) { err, address, publicKey ->
+            UportHDSigner().createHDSeed(this, KeyProtection.Level.PROMPT) { err, address, _ ->
 
                 if (err != null) {
                     key_status.text = err.message

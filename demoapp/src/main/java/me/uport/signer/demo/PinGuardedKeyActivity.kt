@@ -1,3 +1,5 @@
+@file:Suppress("SetTextI18n")
+
 package me.uport.signer.demo
 
 import android.os.Bundle
@@ -24,7 +26,7 @@ class PinGuardedKeyActivity : AppCompatActivity() {
         }
 
         createKeyBtn.setOnClickListener {
-            UportHDSigner().createHDSeed(this, KeyProtection.Level.SINGLE_PROMPT) { err, address, publicKey ->
+            UportHDSigner().createHDSeed(this, KeyProtection.Level.SINGLE_PROMPT) { err, address, _ ->
 
                 if (err != null) {
                     key_status.text = err.message
