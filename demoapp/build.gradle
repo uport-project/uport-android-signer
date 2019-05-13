@@ -52,9 +52,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support_lib_version"
     implementation "com.android.support:design:$support_lib_version"
 
-//    def uport_signer_version = "0.2.3"
-//    implementation "com.github.uport-project.uport-android-signer:signer:$uport_signer_version"
-    implementation project(":signer")
+    implementation "com.github.uport-project.uport-android-signer:signer:0.3.0"
+//    implementation project(":signer")
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
 

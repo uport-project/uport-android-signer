@@ -1,5 +1,8 @@
 ## Uport android signer
 
+[![](https://jitpack.io/v/uport-project/uport-android-signer.svg)](https://jitpack.io/#uport-project/uport-android-signer)
+[![CircleCI](https://circleci.com/gh/uport-project/uport-android-signer.svg?style=svg)](https://circleci.com/gh/uport-project/uport-android-signer)
+
 This library is used to create and manage keys for uport account. 
 It supports creating keyPairs from seed phrases,
 protecting these keys with authenticated encryption (android lock-screen / fingerprint),
@@ -25,7 +28,7 @@ allprojects {
 ```
 in your app `build.gradle`:
 ```groovy
-uport_signer_version = "0.2.2"
+uport_signer_version = "0.3.0"
 dependencies {
     //...
     implementation "com.github.uport-project.uport-android-signer:signer:$uport_signer_version"
@@ -62,13 +65,15 @@ The seed is representable by a bip39 mnemonic phrase.
 
 ```kotlin
 UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE, { err, seedHandle, publicKey ->
-                //seed has been created and is accessible using seedHandle 
-                // * the handle is `seedHandle`
-                // * the corresponding publicKey in base64 encoding is `publicKey`
-                // * if there was an error, those are blank and the `err` object is non null
-                
-                // To use the seed, refer to it using this `seedHandle` 
-            })
+    if (err != null) {
+        //handle error
+    } else {
+        //seed has been created and is accessible using seedHandle 
+        // * the handle is `seedHandle` - save this so you can use the seed later
+        // * `publicKey` - a publicKey in base64 encoding, 
+        // corresponding to the private key derived using the `UPORT_ROOT_DERIVATION_PATH` "m/7696500'/0'/0'/0'"
+    } 
+})
 ```
 
 You can also import bip39 mnemonic phrases:
@@ -80,16 +85,16 @@ val phrase = "vessel ladder alter ... glass valve picture"
 
 UportHDSigner().importHDSeed(activity, KeyProtection.Level.SIMPLE, phrase, { err, seedHandle, publicKey ->
 
-                if (err != null) {
-                    //handle error
-                } else {
-                    assertEquals("0x794a...e96ac8", seedHandle)
-                    //seed has been imported and 
-                    // * the handle is `seedHandle`
-                    // * the corresponding publicKey in base64 is `publicKey`
-                }
-                 
-            })
+    if (err != null) {
+        //handle error
+    } else {
+        assertEquals("0x794a...e96ac8", seedHandle)
+        //seed has been imported and 
+        // * the handle is `seedHandle`
+        // * the corresponding publicKey in base64 is `publicKey`
+    }
+         
+})
 ```
 
 #### Signing
@@ -113,7 +118,7 @@ val derivationPath = "m/44'/60'/0'/0/0"
 val txPayloadB64 = Base64.encodeToString( transaction.rlpEncode(), Base64.DEFAULT )
 
 //gets shown to the user on fingerprint dialog or on lockscreen, based on `KeyProtection.Level` used
-val prompt = "Please sign this transaction"
+val prompt = "Unlock your key to sign this transaction"
 
 UportHDSigner().signTransaction(activity, seedHandle, derivationPath, txPayloadB64, prompt, { err, sigData ->
     if (err != null) {
@@ -137,6 +142,8 @@ Also, do note that in the current version of this API,
 
 ```kotlin
 
+val prompt = "Unlock your key to sign this credential"
+
 UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt, { err, sigData ->
     if (err != null) {
         //process the error
@@ -150,8 +157,11 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 ### Changelog
 
+### 0.3.0
+    * key management codebase moved back to this repo
+    * [breaking] updated to kotlin 1.3.x, kethereum 0.75.1 - will require some import changes
 
-#### latest
+#### v0.2.x
     * *the signer library has moved to [uport-android-sdk](https://github.com/uport-project/uport-android-sdk)*
 
 #### v0.2.2
