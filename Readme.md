@@ -31,7 +31,7 @@ in your app `build.gradle`:
 uport_signer_version = "0.3.0"
 dependencies {
     //...
-    implementation "com.github.uport-project.uport-android-signer:signer:$uport_signer_version"
+    implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
 }
 ```
 
