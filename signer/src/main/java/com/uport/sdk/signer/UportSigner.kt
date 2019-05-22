@@ -98,13 +98,13 @@ open class UportSigner {
                 level,
                 label,
                 privateKeyBytes
-        ) { err, _ ->
+        ) { encryptionError, _ ->
 
             //empty memory
             privateKeyBytes.fill(0)
 
-            if (err != null) {
-                return@storeEncryptedPayload callback(err, "", "")
+            if (encryptionError != null) {
+                return@storeEncryptedPayload callback(encryptionError, "", "")
             }
 
             return@storeEncryptedPayload callback(null, address, publicKeyString)
@@ -147,10 +147,10 @@ open class UportSigner {
             return callback(storageError, EMPTY_SIGNATURE_DATA)
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey) { err, privateKeyBytes ->
+        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey) { decryptionError, privateKeyBytes ->
 
-            if (err != null) {
-                return@decrypt callback(err, EMPTY_SIGNATURE_DATA)
+            if (decryptionError != null) {
+                return@decrypt callback(decryptionError, EMPTY_SIGNATURE_DATA)
             }
 
             try {
@@ -162,8 +162,8 @@ open class UportSigner {
                 val sigData = keyPair.signMessage(txBytes)
                 return@decrypt callback(null, sigData)
 
-            } catch (exception: Exception) {
-                return@decrypt callback(exception, EMPTY_SIGNATURE_DATA)
+            } catch (signError: Exception) {
+                return@decrypt callback(signError, EMPTY_SIGNATURE_DATA)
             }
 
         }
@@ -226,9 +226,9 @@ open class UportSigner {
             return callback(storageError, SignatureData())
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey) { err, privateKeyBytes ->
-            if (err != null) {
-                return@decrypt callback(err, SignatureData())
+        encryptionLayer.decrypt(context, prompt, encryptedPrivateKey) { decryptionError, privateKeyBytes ->
+            if (decryptionError != null) {
+                return@decrypt callback(decryptionError, SignatureData())
             }
 
             try {
@@ -238,8 +238,8 @@ open class UportSigner {
                 privateKeyBytes.fill(0)
 
                 return@decrypt callback(null, sig)
-            } catch (exception: Exception) {
-                return@decrypt callback(err, SignatureData())
+            } catch (signingError: Exception) {
+                return@decrypt callback(signingError, SignatureData())
             }
         }
     }

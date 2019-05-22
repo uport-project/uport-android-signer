@@ -93,8 +93,8 @@ class UportHDSigner : UportSigner() {
 
                 return@storeEncryptedPayload callback(null, address, publicKeyString)
             }
-        } catch (ex: Exception) {
-            return callback(ex, "", "")
+        } catch (seedImprotError: Exception) {
+            return callback(seedImprotError, "", "")
         }
     }
 
@@ -138,10 +138,10 @@ class UportHDSigner : UportSigner() {
             return callback(storageError, EMPTY_SIGNATURE_DATA)
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedEntropy) { err, entropyBuff ->
+        encryptionLayer.decrypt(context, prompt, encryptedEntropy) { decryptError, entropyBuff ->
 
-            if (err != null) {
-                return@decrypt callback(err, EMPTY_SIGNATURE_DATA)
+            if (decryptError != null) {
+                return@decrypt callback(decryptError, EMPTY_SIGNATURE_DATA)
             }
 
             try {
@@ -156,8 +156,8 @@ class UportHDSigner : UportSigner() {
                 val sigData = keyPair.signMessage(txBytes)
                 return@decrypt callback(null, sigData)
 
-            } catch (exception: Exception) {
-                return@decrypt callback(exception, EMPTY_SIGNATURE_DATA)
+            } catch (signError: Exception) {
+                return@decrypt callback(signError, EMPTY_SIGNATURE_DATA)
             }
 
         }
@@ -189,9 +189,9 @@ class UportHDSigner : UportSigner() {
             return callback(storageError, SignatureData())
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedEntropy) { err, entropyBuff ->
-            if (err != null) {
-                return@decrypt callback(err, SignatureData())
+        encryptionLayer.decrypt(context, prompt, encryptedEntropy) { decryptError, entropyBuff ->
+            if (decryptError != null) {
+                return@decrypt callback(decryptError, SignatureData())
             }
 
             try {
@@ -204,8 +204,8 @@ class UportHDSigner : UportSigner() {
                 val sig = signJwt(payloadBytes, keyPair)
 
                 return@decrypt callback(null, sig)
-            } catch (exception: Exception) {
-                return@decrypt callback(err, SignatureData())
+            } catch (signError: Exception) {
+                return@decrypt callback(signError, SignatureData())
             }
         }
     }
@@ -226,9 +226,9 @@ class UportHDSigner : UportSigner() {
             return callback(storageError, "", "")
         }
 
-        encryptionLayer.decrypt(context, prompt, encryptedEntropy) { err, entropyBuff ->
-            if (err != null) {
-                return@decrypt callback(storageError, "", "")
+        encryptionLayer.decrypt(context, prompt, encryptedEntropy) { decryptError, entropyBuff ->
+            if (decryptError != null) {
+                return@decrypt callback(decryptError, "", "")
             }
 
             try {
@@ -243,8 +243,8 @@ class UportHDSigner : UportSigner() {
 
                 return@decrypt callback(null, address, publicKeyString)
 
-            } catch (exception: Exception) {
-                return@decrypt callback(err, "", "")
+            } catch (derivationError: Exception) {
+                return@decrypt callback(derivationError, "", "")
             }
         }
 
@@ -275,7 +275,7 @@ class UportHDSigner : UportSigner() {
                 val phrase = entropyToMnemonic(entropyBuff, WORDLIST_ENGLISH)
                 return@decrypt callback(null, phrase)
             } catch (exception: Exception) {
-                return@decrypt callback(err, "")
+                return@decrypt callback(exception, "")
             }
         }
     }
