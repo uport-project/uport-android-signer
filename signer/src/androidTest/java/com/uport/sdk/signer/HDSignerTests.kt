@@ -1,13 +1,17 @@
 package com.uport.sdk.signer
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.support.test.InstrumentationRegistry
+import assertk.assert
+import assertk.assertions.isNotNull
 import com.uport.sdk.signer.encryption.KeyProtection.Level.SIMPLE
+import com.uport.sdk.signer.testutil.ensureKeyIsImportedInTargetContext
 import com.uport.sdk.signer.testutil.ensureSeedIsImportedInTargetContext
 import me.uport.sdk.core.decodeBase64
-import me.uport.sdk.signer.decodeJose
 import me.uport.sdk.core.padBase64
 import me.uport.sdk.core.toBase64
+import me.uport.sdk.signer.decodeJose
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -19,6 +23,7 @@ import org.kethereum.bip39.model.MnemonicWords
 import org.kethereum.bip39.toSeed
 import org.kethereum.extensions.hexToBigInteger
 import org.spongycastle.jce.provider.BouncyCastleProvider
+import org.walleth.khex.hexToByteArray
 import java.security.Security
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -156,6 +161,65 @@ class HDSignerTests {
         tested.deleteSeed(context, refRoot)
 
         assertFalse(tested.allHDRoots(context).contains(refRoot))
+    }
+
+    @Test
+    fun returns_error_when_HD_signing_invalid_jwt_bundle() {
+        val referencePhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
+        val refRoot = ensureSeedIsImportedInTargetContext(referencePhrase)
+        val latch = CountDownLatch(1)
+        UportHDSigner().signJwtBundle(
+                context,
+                refRoot,
+                "m/",
+                "this is not base 64 !@#$%",
+                ""
+        ) { err, sig ->
+            // should fail when decoding bad base64
+            assert(err).isNotNull()
+            latch.countDown()
+        }
+        latch.await()
+    }
+
+    @Test
+    fun returns_error_when_signing_invalid_jwt_bundle() {
+        val ref = ensureKeyIsImportedInTargetContext("5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38".hexToByteArray())
+        val latch = CountDownLatch(1)
+        UportSigner().signJwtBundle(
+                context,
+                ref,
+                "this is not base 64 !@#$%",
+                ""
+        ) { err, sig ->
+            // should fail when decoding bad base64
+            assert(err).isNotNull()
+            latch.countDown()
+        }
+        latch.await()
+    }
+
+    @Test
+    fun returns_error_when_computing_address_for_invalid_seed() {
+
+        val referencePhrase = "vessel ladder alter error federal sibling chat ability sun glass valve picture"
+        val seedHandle = ensureSeedIsImportedInTargetContext(referencePhrase)
+
+        val prefs = InstrumentationRegistry.getTargetContext().getSharedPreferences("eth_signer_store", MODE_PRIVATE)
+        prefs.edit().putString("seed-$seedHandle", "corrupted seed data").apply()
+
+        val latch = CountDownLatch(1)
+        UportHDSigner().computeAddressForPath(
+                context,
+                seedHandle,
+                "m/",
+                ""
+        ) { err, _, _ ->
+            assert(err).isNotNull()
+            latch.countDown()
+        }
+        latch.await()
+
     }
 
 }
