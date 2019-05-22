@@ -3,7 +3,7 @@ package com.uport.sdk.signer
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.support.test.InstrumentationRegistry
-import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isNotNull
 import com.uport.sdk.signer.encryption.KeyProtection.Level.SIMPLE
 import com.uport.sdk.signer.testutil.ensureKeyIsImportedInTargetContext
@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 class HDSignerTests {
 
     init {
-        //Kethereum has some provider initialization code that is causing problems if that code is used before any hybrid encryption code
+        //KEthereum has some provider initialization code that is causing problems if that code is used before any hybrid encryption code
         // the failure shows up as "java.lang.AssertionError: expected null, but was:<java.lang.IllegalStateException: Can't generate certificate>"
         //TODO: check back here when that is fixed: https://github.com/walleth/kethereum/issues/22
         Security.addProvider(BouncyCastleProvider())
@@ -174,9 +174,9 @@ class HDSignerTests {
                 "m/",
                 "this is not base 64 !@#$%",
                 ""
-        ) { err, sig ->
+        ) { err, _ ->
             // should fail when decoding bad base64
-            assert(err).isNotNull()
+            assertThat(err).isNotNull()
             latch.countDown()
         }
         latch.await()
@@ -191,9 +191,9 @@ class HDSignerTests {
                 ref,
                 "this is not base 64 !@#$%",
                 ""
-        ) { err, sig ->
+        ) { err, _ ->
             // should fail when decoding bad base64
-            assert(err).isNotNull()
+            assertThat(err).isNotNull()
             latch.countDown()
         }
         latch.await()
@@ -215,7 +215,7 @@ class HDSignerTests {
                 "m/",
                 ""
         ) { err, _, _ ->
-            assert(err).isNotNull()
+            assertThat(err).isNotNull()
             latch.countDown()
         }
         latch.await()
