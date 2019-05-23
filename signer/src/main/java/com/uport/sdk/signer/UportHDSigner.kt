@@ -64,8 +64,6 @@ class UportHDSigner : UportSigner() {
     fun importHDSeed(context: Context, level: KeyProtection.Level, phrase: String, callback: (err: Exception?, address: String, pubKey: String) -> Unit) {
 
         try {
-//            val seedBuffer = mnemonicToSeed(phrase)
-
             val entropyBuffer = mnemonicToEntropy(phrase, WORDLIST_ENGLISH)
 
             val extendedRootKey = MnemonicWords(phrase).toKey(UPORT_ROOT_DERIVATION_PATH)
@@ -93,8 +91,8 @@ class UportHDSigner : UportSigner() {
 
                 return@storeEncryptedPayload callback(null, address, publicKeyString)
             }
-        } catch (seedImprotError: Exception) {
-            return callback(seedImprotError, "", "")
+        } catch (seedImportError: Exception) {
+            return callback(seedImportError, "", "")
         }
     }
 
