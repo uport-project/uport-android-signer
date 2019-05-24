@@ -43,7 +43,8 @@ class FingerprintDialog : DialogFragment() {
 
         retainInstance = true
 
-        purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE) ?: arguments?.getString(KEY_DIALOG_PURPOSE) ?: ""
+        purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE)
+                ?: arguments?.getString(KEY_DIALOG_PURPOSE) ?: ""
 
         fingerprintManager = context?.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
         successColor = context?.getColor(R.color.uport_fingerprint_green) ?: Color.GREEN

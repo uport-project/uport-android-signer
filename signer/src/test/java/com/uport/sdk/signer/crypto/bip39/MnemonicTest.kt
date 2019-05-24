@@ -1,11 +1,18 @@
 package com.uport.sdk.signer.crypto.bip39
 
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.kethereum.bip39.*
+import org.kethereum.bip39.entropyToMnemonic
+import org.kethereum.bip39.mnemonicToEntropy
 import org.kethereum.bip39.model.MnemonicWords
+import org.kethereum.bip39.toKey
+import org.kethereum.bip39.toSeed
+import org.kethereum.bip39.validate
 import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import org.walleth.khex.hexToByteArray
