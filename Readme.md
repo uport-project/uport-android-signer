@@ -157,30 +157,24 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 ### Changelog
 
-#### 0.3.0
+#### 0.3.1
+* bugfix - silent errors when signing JWTs
 
+#### 0.3.0
 * key management codebase moved back to this repo
 * [breaking] updated to kotlin 1.3.x, kethereum 0.75.1 - will require some import changes
 
-
 #### v0.2.x
-
 * the signer library was moved to [uport-android-sdk](https://github.com/uport-project/uport-android-sdk)
 
-
 #### v0.2.2
-
 * [feature] enable recoverable signature in JOSE encoding (#11)
 
-
 #### v0.2.1
-
 * [bugfix] incorrect exception when activity context was needed (#5)
 * [feature] add functionality to delete keys/seeds (#8)
 
-
 #### v0.2.0
-
 * lowered minSDK requirements to 19
     All eth keys and seeds are encrypted with RSA provided by the AndroidKeyStore API, but before SDK 23 that API does not enforce user authentication at runtime so the Keyguard requirement is emulated on Lolipop and not possible on KitKat
 * no longer depending on all of kethereum, only using the `crypto` and `bip39` libraries
@@ -188,10 +182,8 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
     If you were depending on that, please add a direct dependency to kethereum.
 * also, updated the kethereum dependency to v0.53. If you were depending on an older version, you need to update too
 
-
 #### v0.1.1
 * to make the `v` recovery param available to calling classes, JWT signing produces `SignatureData` instead of a JOSE encoded signature String
-
 
 #### v0.0.1
 * initial release

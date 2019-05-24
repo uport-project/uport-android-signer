@@ -26,7 +26,7 @@ buildscript {
         kethereum_version = "0.75.1"
         kotlin_common_version = "0.1.1"
 
-        current_release_version = "0.3.0"
+        current_release_version = "0.3.1"
     }
 
     repositories {
