@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.uport.sdk.signer.UportHDSigner
 import com.uport.sdk.signer.encryption.KeyProtection
 import kotlinx.android.synthetic.main.activity_create_keys.*
+import kotlinx.android.synthetic.main.activity_pin_guarded_key.*
 import kotlinx.android.synthetic.main.content_create_keys.*
 import me.uport.sdk.core.decodeBase64
 import org.kethereum.bip39.generateMnemonic
@@ -21,6 +22,19 @@ class CreateKeysActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_keys)
         setSupportActionBar(toolbar)
+
+        var hardwareStatusText = ""
+        UportHDSigner().hasSecuredKeyguard(this) {
+            hardwareStatusText += "\nsecure keyguard: $it"
+        }
+        UportHDSigner().hasFingerprintHardware(this) {
+            hardwareStatusText += "\nfingerprint hardware: $it"
+        }
+        UportHDSigner().hasSetupFingerprints(this) {
+            hardwareStatusText += "\nfingerprints enrolled: $it"
+        }
+
+        errorField.text = hardwareStatusText
 
         generateButton.setOnClickListener {
             val phrase = generateMnemonic(wordList = WORDLIST_ENGLISH)
@@ -44,5 +58,4 @@ class CreateKeysActivity : AppCompatActivity() {
             }
         }
     }
-
 }
