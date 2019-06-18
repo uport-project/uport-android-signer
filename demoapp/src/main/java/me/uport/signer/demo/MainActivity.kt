@@ -22,16 +22,5 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, UseKeysActivity::class.java)
             startActivity(intent)
         }
-
-        use_keyguard.setOnClickListener {
-            val intent = Intent(this, PinGuardedKeyActivity::class.java)
-            startActivity(intent)
-        }
-
-        use_fingerprints.setOnClickListener {
-            val intent = Intent(this, FingerprintGuardedKeyActivity::class.java)
-            startActivity(intent)
-        }
     }
-
 }
