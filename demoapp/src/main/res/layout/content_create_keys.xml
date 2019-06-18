@@ -8,55 +8,16 @@
                                              tools:context="me.uport.signer.demo.CreateKeysActivity"
                                              tools:showIn="@layout/activity_create_keys">
 
-    <Button
-            android:id="@+id/generateButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Generate new"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-    <Button
-            android:id="@+id/importButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Import"
-            app:layout_constraintBottom_toBottomOf="@+id/mnemonicPhraseField"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/mnemonicPhraseField"/>
-
-    <AutoCompleteTextView
-            android:id="@+id/mnemonicPhraseField"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:hint="mnemonic phrase"
-            android:inputType="textNoSuggestions"
-            android:lines="7"
-            android:maxLines="10"
-            android:minLines="5"
-            android:singleLine="false"
-            app:layout_constraintEnd_toStartOf="@+id/importButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/generateButton"
-            tools:text="mnemonic phrase"/>
-
     <TextView
             android:id="@+id/message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="8dp"
             android:text="Select a key protection level"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/mnemonicPhraseField"
-            app:layout_constraintTop_toBottomOf="@+id/mnemonicPhraseField"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     <RadioGroup
             android:id="@+id/keyProtectionOptions"
@@ -89,6 +50,44 @@
 
     </RadioGroup>
 
+    <Button
+            android:id="@+id/generateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="1dp"
+            android:text="Generate new"
+            app:layout_constraintBottom_toBottomOf="@+id/mnemonicPhraseField"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/mnemonicPhraseField"/>
+
+    <AutoCompleteTextView
+            android:id="@+id/mnemonicPhraseField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:hint="mnemonic phrase"
+            android:inputType="textNoSuggestions"
+            android:lines="7"
+            android:maxLines="10"
+            android:minLines="5"
+            android:singleLine="false"
+            app:layout_constraintEnd_toStartOf="@+id/generateButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/keyProtectionOptions"
+            tools:text="mnemonic phrase"/>
+
+    <Button
+            android:id="@+id/importButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Import"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/mnemonicPhraseField"
+            app:layout_constraintTop_toBottomOf="@+id/mnemonicPhraseField"/>
+
     <TextView
             android:id="@+id/errorField"
             android:layout_width="0dp"
@@ -97,8 +96,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/keyProtectionOptions"
-            app:layout_constraintTop_toBottomOf="@+id/keyProtectionOptions"/>
+            app:layout_constraintStart_toStartOf="@+id/importButton"
+            app:layout_constraintTop_toBottomOf="@+id/importButton"/>
 
     <TextView
             android:id="@+id/publicKeyField"
@@ -109,7 +108,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/keyProtectionOptions"
+            app:layout_constraintStart_toStartOf="@+id/importButton"
             app:layout_constraintTop_toBottomOf="@+id/errorField"/>
 
     <TextView
@@ -121,7 +120,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toStartOf="@+id/keyProtectionOptions"
+            app:layout_constraintStart_toStartOf="@+id/importButton"
             app:layout_constraintTop_toBottomOf="@+id/publicKeyField"/>
 
 
