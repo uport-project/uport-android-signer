@@ -3,6 +3,7 @@ package me.uport.signer.demo
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import com.uport.sdk.signer.UportHDSigner
 import com.uport.sdk.signer.encryption.KeyProtection
 import kotlinx.android.synthetic.main.activity_create_keys.*
@@ -28,13 +29,20 @@ class CreateKeysActivity : AppCompatActivity() {
 
         importButton.setOnClickListener { _ ->
             val phrase = mnemonicPhraseField.text.toString()
-            UportHDSigner().importHDSeed(this, KeyProtection.Level.SIMPLE, phrase) { err, address, publicKey ->
+            val selectedOption = keyProtectionOptions.checkedRadioButtonId
+
+            val protection: KeyProtection.Level = when(selectedOption) {
+                R.id.keyguard -> KeyProtection.Level.SINGLE_PROMPT
+                R.id.fingerprint -> KeyProtection.Level.PROMPT
+                else -> KeyProtection.Level.SIMPLE
+            }
+
+            UportHDSigner().importHDSeed(this, protection, phrase) { err, address, publicKey ->
                 errorField.text = "error: ${err.toString()}"
                 publicKeyField.text = "publicKey: ${publicKey.decodeBase64().toHexString()}"
                 addressField.text = "address: $address"
             }
         }
-
     }
 
 }
