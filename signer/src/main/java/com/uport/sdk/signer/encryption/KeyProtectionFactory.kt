@@ -38,8 +38,8 @@ object KeyProtectionFactory {
                     FingerprintAsymmetricProtection()
                 } else {
 
-                    // pop keyguard with 0 second authentication window (practically for every use)
-                    val sessionTime = 0
+                    // pop keyguard with 1 second authentication window
+                    val sessionTime = 1
 
                         /**
                          * reason for this behavior:
@@ -53,7 +53,8 @@ object KeyProtectionFactory {
                          *  > java.lang.IllegalStateException: At least one fingerprint must be enrolled
                          *  > to create keys requiring user authentication for every use"
                          *
-                         * Therefore, we emulate this by a 0 second authentication window
+                         * Therefore, we need to emulate this by a 1 second authentication window
+                         * which should be enough to perform the decryption.
                          */
 
                     KeyguardAsymmetricProtection(sessionTime)
