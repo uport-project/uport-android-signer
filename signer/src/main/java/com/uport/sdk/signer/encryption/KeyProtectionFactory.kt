@@ -37,21 +37,25 @@ object KeyProtectionFactory {
                 if (KeyProtection.hasSetupFingerprint(context)) {
                     FingerprintAsymmetricProtection()
                 } else {
-                    val sessionTime = if (KeyProtection.hasFingerprintHardware(context)) {
-                        0 // pop keyguard with 0 second authentication window (practically for every use)
+
+                    // pop keyguard with 0 second authentication window (practically for every use)
+                    val sessionTime = 0
 
                         /**
                          * reason for this behavior:
                          *
-                         * on devices that have fingerprint hardware but haven't setup fingerprints
+                         * On devices that have fingerprint hardware but haven't setup fingerprints
                          * an IllegalBlockSizeException is thrown if the requested session time is "-1"
                          * with the cause being KeyStoreException("Key user not authenticated")
                          *
+                         * Also, on some devices that DO NOT HAVE fingerprint hardware, using a "-1"
+                         * session time would throw
+                         *  > java.lang.IllegalStateException: At least one fingerprint must be enrolled
+                         *  > to create keys requiring user authentication for every use"
+                         *
                          * Therefore, we emulate this by a 0 second authentication window
                          */
-                    } else {
-                        -1 // pop keyguard for every use
-                    }
+
                     KeyguardAsymmetricProtection(sessionTime)
                 }
             }
