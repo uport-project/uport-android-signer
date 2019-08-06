@@ -1,8 +1,8 @@
 buildscript {
     ext {
-        kotlin_version = "1.3.31"
+        kotlin_version = "1.3.41"
         android_tools_version = '3.4.1'
-        coroutines_version = "1.2.1"
+        coroutines_version = "1.2.2"
 
         build_tools_version = "28.0.3"
 
@@ -25,6 +25,7 @@ buildscript {
         spongycastle_version = "1.58.0.0"
         kethereum_version = "0.75.1"
         kotlin_common_version = "0.1.1"
+        jacoco_version = "0.8.4"
 
         current_release_version = "0.3.1"
     }
@@ -71,6 +72,13 @@ detekt {
 }
 
 allprojects {
+
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = jacoco_version
+    }
+
     repositories {
         google()
         jcenter()
@@ -124,6 +132,25 @@ subprojects { subproject ->
 }
 
 apply from: "publishing.gradle"
+
+task jacocoReport(type: JacocoReport) {
+    subprojects { sub ->
+        afterEvaluate {
+            //subproject tasks can only be gathered after evaluation
+            def testTasks = sub.tasks.withType(Test)
+            dependsOn testTasks
+            executionData testTasks
+        }
+        classDirectories.from(file("${sub.buildDir}/classes/java/main"))
+        classDirectories.from(file("${sub.buildDir}/classes/kotlin/main"))
+    }
+
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
 
 task clean(type: Delete) {
     delete rootProject.buildDir
