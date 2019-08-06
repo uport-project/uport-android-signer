@@ -42,6 +42,7 @@ abstract class KeyProtection {
         /**
          * unused yet - defaults to [SIMPLE]
          */
+        @Suppress("unused")
         CLOUD
     }
 
