@@ -28,7 +28,7 @@ allprojects {
 ```
 in your app `build.gradle`:
 ```groovy
-uport_signer_version = "0.3.0"
+uport_signer_version = "0.3.2"
 dependencies {
     //...
     implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
@@ -157,8 +157,12 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 ### Changelog
 
+#### 0.3.2
+* [bugfix] IllegalStateException on devices without fingerprint sensor (#17)
+* [support] add test coverage (#16)
+
 #### 0.3.1
-* bugfix - silent errors when signing JWTs
+* [bugfix] silent errors when signing JWTs (#14)
 
 #### 0.3.0
 * key management codebase moved back to this repo
