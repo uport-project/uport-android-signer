@@ -27,7 +27,7 @@ buildscript {
         kotlin_common_version = "0.1.2"
         jacoco_version = "0.8.4"
 
-        current_release_version = "0.3.2"
+        current_release_version = "0.3.3"
     }
 
     repositories {
