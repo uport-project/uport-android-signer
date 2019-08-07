@@ -28,7 +28,7 @@ allprojects {
 ```
 in your app `build.gradle`:
 ```groovy
-uport_signer_version = "0.3.2"
+uport_signer_version = "0.3.3"
 dependencies {
     //...
     implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
@@ -156,6 +156,9 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 
 ### Changelog
+
+#### 0.3.3
+* [bugfix] erratic `UserNotAuthenticatedException` when using `prompt` with pattern keyguard (#18)
 
 #### 0.3.2
 * [bugfix] IllegalStateException on devices without fingerprint sensor (#17)
