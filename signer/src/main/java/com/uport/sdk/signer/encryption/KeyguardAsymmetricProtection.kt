@@ -3,6 +3,7 @@ package com.uport.sdk.signer.encryption
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.security.keystore.UserNotAuthenticatedException
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.DecryptionCallback
@@ -62,7 +63,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
     }
 
 
-    private fun decryptAfterKeyguard(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
+    private fun decryptAfterKeyguard(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback, retriesLeft : Int = 1) {
         if (context is AppCompatActivity) {
             showKeyguard(
                     context,
@@ -77,7 +78,26 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
                                     //finally decrypted.. phew
                                     callback(null, cleartextBytes)
                                 } catch (exception: Exception) {
-                                    callback(exception, ByteArray(0))
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                                        exception is UserNotAuthenticatedException
+                                    ) {
+                                        if (retriesLeft > 0) {
+                                            // re-prompt for authorization if we're still in an unauthorized state.
+                                            // This can happen if the device is too slow and overshoots
+                                            // the authorization window
+                                            decryptAfterKeyguard(
+                                                context,
+                                                purpose,
+                                                ciphertext,
+                                                callback,
+                                                retriesLeft - 1
+                                            )
+                                        } else {
+                                            callback(exception, ByteArray(0))
+                                        }
+                                    } else {
+                                        callback(exception, ByteArray(0))
+                                    }
                                 }
                             } else {
                                 callback(RuntimeException(UportSigner.ERR_AUTH_CANCELED), ByteArray(0))
