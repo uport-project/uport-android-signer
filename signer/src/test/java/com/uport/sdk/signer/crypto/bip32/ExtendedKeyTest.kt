@@ -5,15 +5,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.kethereum.bip32.generateChildKey
-import org.kethereum.bip32.model.ExtendedKey
 import org.kethereum.bip32.model.Seed
 import org.kethereum.bip32.toExtendedKey
 import org.kethereum.bip44.BIP44Element
-import org.kethereum.model.ECKeyPair
-import org.kethereum.model.PrivateKey
+import org.komputing.khex.extensions.hexToByteArray
 import org.spongycastle.jce.provider.BouncyCastleProvider
-import org.walleth.khex.hexToByteArray
-import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.Security
@@ -39,7 +35,7 @@ class ExtendedKeyTest {
         val seed = "000102030405060708090a0b0c0d0e0f".hexToByteArray()
         val expectedExtendedPublicKey = "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8"
         val key = Seed(seed).toExtendedKey(true)
-        val encoded = key.serialize()
+        val encoded = key.serialize(publicKeyOnly = true)
         assertEquals(expectedExtendedPublicKey, encoded)
     }
 
@@ -55,6 +51,23 @@ class ExtendedKeyTest {
     }
 
     @Test
+    fun `derive non hardened public vs private`() {
+        val seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542".hexToByteArray()
+        val expectedExtendedPublicKey = "xpub69H7F5d8KSRgmmdJg2KhpAK8SR3DjMwAdkxj3ZuxV27CprR9LgpeyGmXUbC6wb7ERfvrnKZjXoUmmDznezpbZb7ap6r1D3tgFxHmwMkQTPH"
+        val extendedPriv = Seed(seed).toExtendedKey()
+        val extendedPub = Seed(seed).toExtendedKey(publicKeyOnly = true)
+
+        val childPriv = extendedPriv.generateChildKey(BIP44Element(false, 0))
+        val childPub = extendedPub.generateChildKey(BIP44Element(false, 0))
+
+        val encodedPriv = childPriv.serialize(publicKeyOnly = true)
+        val encodedPub = childPub.serialize(publicKeyOnly = true)
+
+        assertEquals(encodedPub, encodedPriv)
+        assertEquals(expectedExtendedPublicKey, encodedPub)
+    }
+
+    @Test
     fun createNonHardenedChildPublicKey() {
         //Chain m/0
         val seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542".hexToByteArray()
@@ -62,7 +75,7 @@ class ExtendedKeyTest {
         val key = Seed(seed).toExtendedKey(true)
 
         val child = key.generateChildKey(BIP44Element(false, 0))
-        val encoded = child.serialize()
+        val encoded = child.serialize(publicKeyOnly = true)
         assertEquals(expectedExtendedPublicKey, encoded)
     }
 
@@ -96,9 +109,8 @@ class ExtendedKeyTest {
 
         val child1 = master.generateChildKey(BIP44Element(false, 0))
         val child2 = child1.generateChildKey(BIP44Element(true, 2147483647))
-                .asPublicOnly()
 
-        val result = child2.serialize()
+        val result = child2.serialize(true)
         assertEquals(expectedExtendedPublicKey, result)
 
     }
@@ -139,5 +151,3 @@ class ExtendedKeyTest {
     }
 
 }
-
-internal fun ExtendedKey.asPublicOnly(): ExtendedKey = this.copy(keyPair = ECKeyPair(PrivateKey(BigInteger.ZERO), this.keyPair.publicKey))

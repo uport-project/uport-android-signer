@@ -3,10 +3,8 @@ package com.uport.sdk.signer.crypto.bip32
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.kethereum.bip32.model.Seed
-import org.kethereum.bip32.model.XPriv
-import org.kethereum.bip32.toExtendedKey
 import org.kethereum.bip32.toKey
-import org.walleth.khex.hexToByteArray
+import org.komputing.khex.extensions.hexToByteArray
 
 class DerivationTest {
 
@@ -18,14 +16,11 @@ class DerivationTest {
 
             val derivedKey = Seed(it.seed.hexToByteArray()).toKey(it.path)
 
-            val obtainedPub = derivedKey.asPublicOnly().serialize()
+            val obtainedPub = derivedKey.serialize(publicKeyOnly = true)
             assertEquals(it.expectedPublicKey, obtainedPub)
 
             val obtainedPrv = derivedKey.serialize()
             assertEquals(it.expectedPrivateKey, obtainedPrv)
-
-            assertEquals(XPriv(it.expectedPublicKey).toExtendedKey(), derivedKey.asPublicOnly())
-            assertEquals(XPriv(it.expectedPrivateKey).toExtendedKey(), derivedKey)
 
             counter++
 

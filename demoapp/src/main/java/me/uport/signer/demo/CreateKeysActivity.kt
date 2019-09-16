@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.content_create_keys.*
 import me.uport.sdk.core.decodeBase64
 import org.kethereum.bip39.generateMnemonic
 import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
-import org.walleth.khex.toHexString
+import org.komputing.khex.extensions.toHexString
 
 
 class CreateKeysActivity : AppCompatActivity() {
@@ -26,9 +26,9 @@ class CreateKeysActivity : AppCompatActivity() {
             mnemonicPhraseField.setText(phrase)
         }
 
-        importButton.setOnClickListener { _ ->
+        importButton.setOnClickListener { view ->
             val phrase = mnemonicPhraseField.text.toString()
-            UportHDSigner().importHDSeed(this, KeyProtection.Level.SIMPLE, phrase) { err, address, publicKey ->
+            UportHDSigner().importHDSeed(view.context, KeyProtection.Level.SIMPLE, phrase) { err, address, publicKey ->
                 errorField.text = "error: ${err.toString()}"
                 publicKeyField.text = "publicKey: ${publicKey.decodeBase64().toHexString()}"
                 addressField.text = "address: $address"
