@@ -14,6 +14,8 @@ encryption backed by ARM Trusted Execution Environment (TEE).
 Note: The curve used for ETH signing is not backed by the TEE,
 therefore private keys exist in memory while in use but are encrypted with TEE keys at rest.
 
+[FAQ and helpdesk support](http://bit.ly/uPort_helpdesk)
+
 ### Import
 
 in your main `build.gradle`:
