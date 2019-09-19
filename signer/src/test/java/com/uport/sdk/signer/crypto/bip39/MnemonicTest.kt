@@ -14,8 +14,8 @@ import org.kethereum.bip39.toKey
 import org.kethereum.bip39.toSeed
 import org.kethereum.bip39.validate
 import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
+import org.komputing.khex.extensions.hexToByteArray
 import org.spongycastle.jce.provider.BouncyCastleProvider
-import org.walleth.khex.hexToByteArray
 import java.security.Security
 
 /**

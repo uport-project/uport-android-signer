@@ -20,9 +20,9 @@ import org.kethereum.crypto.signMessage
 import org.kethereum.crypto.toECKeyPair
 import org.kethereum.extensions.hexToBigInteger
 import org.kethereum.model.PrivateKey
+import org.komputing.khex.extensions.hexToByteArray
+import org.komputing.khex.extensions.toNoPrefixHexString
 import org.spongycastle.util.encoders.Hex
-import org.walleth.khex.hexToByteArray
-import org.walleth.khex.toNoPrefixHexString
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -185,6 +185,7 @@ class SignerTests {
         assertEquals(referenceSignature, sigData)
     }
 
+    @Suppress("DEPRECATION")
     @Test
     fun testJwtDer() {
         val referencePrivateKey = "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38"
