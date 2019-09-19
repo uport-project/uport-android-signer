@@ -1,3 +1,5 @@
+import java.time.temporal.TemporalAdjusters
+
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 apply plugin: "com.github.dcendents.android-maven"
@@ -39,11 +41,14 @@ android {
 //        execution "ANDROID_TEST_ORCHESTRATOR"
     }
 
-}
+    packagingOptions {
+        exclude "META-INF/main.kotlin_module"
+        exclude "META-INF/atomicfu.kotlin_module"
+        exclude "META-INF/kotlinx-io.kotlin_module"
+        exclude "META-INF/extensions.kotlin_module"
+        exclude "META-INF/core.kotlin_module"
+    }
 
-//XXX: this is needed until https://github.com/komputing/KEthereum/issues/65 is fixed
-configurations.all {
-    exclude group: "com.github.walleth"
 }
 
 dependencies {
@@ -51,17 +56,26 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "com.android.support:appcompat-v7:$support_lib_version"
 
-    api "com.github.komputing.KEthereum:bip39:$kethereum_version"
-    api "com.github.komputing.KEthereum:bip32:$kethereum_version"
-    api "com.github.komputing.KEthereum:bip39_wordlist_en:$kethereum_version"
+    implementation "com.github.komputing.KEthereum:bip39:$kethereum_version"
+    implementation "com.github.komputing.KEthereum:bip32:$kethereum_version"
+    implementation "com.github.komputing.KEthereum:bip39_wordlist_en:$kethereum_version"
+
+    api "com.github.komputing.KEthereum:model:$kethereum_version"
+
+    implementation "com.github.komputing.KEthereum:crypto:$kethereum_version"
+    implementation "com.github.komputing.KEthereum:extensions:$kethereum_version"
+    implementation "com.github.komputing.KEthereum:hashes:$kethereum_version"
     api "com.github.uport-project.kotlin-common:signer-common:$kotlin_common_version"
+    implementation "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
     implementation "com.madgag.spongycastle:prov:$spongycastle_version"
 
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test:rules:$test_rules_version"
     androidTestImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     androidTestImplementation "com.github.uport-project.kotlin-common:test-helpers:$kotlin_common_version"
+    androidTestImplementation "com.github.komputing.KHex:extensions-jvm:$khex_version"
 
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     testImplementation "com.github.komputing.KEthereum:bip44:$kethereum_version"
+    testImplementation "com.github.komputing.KHex:extensions-jvm:$khex_version"
 }

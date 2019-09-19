@@ -379,7 +379,7 @@ open class UportSigner {
 
         data class EncryptionCombo(val keyProtection: KeyProtection, val encPayload: String, val err: Exception?)
 
-        internal val EMPTY_SIGNATURE_DATA = SignatureData(BigInteger.ZERO, BigInteger.ZERO, 0)
+        internal val EMPTY_SIGNATURE_DATA = SignatureData(BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO)
 
     }
 

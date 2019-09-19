@@ -14,6 +14,8 @@ encryption backed by ARM Trusted Execution Environment (TEE).
 Note: The curve used for ETH signing is not backed by the TEE,
 therefore private keys exist in memory while in use but are encrypted with TEE keys at rest.
 
+[FAQ and helpdesk support](http://bit.ly/uPort_helpdesk)
+
 ### Import
 
 in your main `build.gradle`:
@@ -28,7 +30,7 @@ allprojects {
 ```
 in your app `build.gradle`:
 ```groovy
-uport_signer_version = "0.3.3"
+uport_signer_version = "0.3.4"
 dependencies {
     //...
     implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
@@ -156,6 +158,9 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 
 ### Changelog
+
+#### 0.3.4
+* [support] upgrade to kethereum 0.76.1 (#19)
 
 #### 0.3.3
 * [bugfix] erratic `UserNotAuthenticatedException` when using `prompt` with pattern keyguard (#18)

@@ -22,8 +22,8 @@ import org.kethereum.bip32.toKey
 import org.kethereum.bip39.model.MnemonicWords
 import org.kethereum.bip39.toSeed
 import org.kethereum.extensions.hexToBigInteger
+import org.komputing.khex.extensions.hexToByteArray
 import org.spongycastle.jce.provider.BouncyCastleProvider
-import org.walleth.khex.hexToByteArray
 import java.security.Security
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
