@@ -2,6 +2,7 @@ package com.uport.sdk.signer
 
 import android.content.Context
 import com.uport.sdk.signer.encryption.KeyProtection
+import org.kethereum.model.SignatureData
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -24,6 +25,9 @@ suspend fun UportHDSigner.createHDSeed(
     }
 }
 
+/**
+ * Extension function that wraps the `UportHDSigner.importHDSeed()` as a coroutine
+ */
 suspend fun UportHDSigner.importHDSeed(
         context: Context,
         level: KeyProtection.Level,
@@ -34,6 +38,26 @@ suspend fun UportHDSigner.importHDSeed(
             it.resumeWithException(err)
         } else {
             it.resume(address to pubKeyBase64)
+        }
+    }
+}
+
+/**
+ * Extension function that wraps the `UportHDSigner.signTransaction()` as a coroutine
+ */
+
+suspend fun UportHDSigner.signTransaction(
+    context: Context,
+    rootAddress: String,
+    derivationPath: String,
+    txPayload: String,
+    prompt: String): SignatureData = suspendCoroutine {
+
+    this.signTransaction(context, rootAddress, derivationPath, txPayload, prompt) { err, sigData ->
+        if (err != null) {
+            it.resumeWithException(err)
+        } else {
+            it.resume(sigData)
         }
     }
 }
@@ -56,6 +80,9 @@ suspend fun UportHDSigner.computeAddressForPath(
     }
 }
 
+/**
+ * Extension function that wraps the `UportHDSigner.showHDSeed()` as a coroutine
+ */
 suspend fun UportHDSigner.showHDSeed(
         context: Context,
         rootAddress: String,
