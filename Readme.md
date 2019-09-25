@@ -159,6 +159,9 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 ### Changelog
 
+#### 0.3.5
+* [feat] add `suspend` extension for `UportHDSigner.signTransaction()` (#21)
+
 #### 0.3.4
 * [support] upgrade to kethereum 0.76.1 (#19)
 
