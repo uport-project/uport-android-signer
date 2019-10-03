@@ -56,15 +56,15 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "com.android.support:appcompat-v7:$support_lib_version"
 
-    implementation "com.github.komputing.KEthereum:bip39:$kethereum_version"
-    implementation "com.github.komputing.KEthereum:bip32:$kethereum_version"
-    implementation "com.github.komputing.KEthereum:bip39_wordlist_en:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip39:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip32:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip39_wordlist_en:$kethereum_version"
 
-    api "com.github.komputing.KEthereum:model:$kethereum_version"
+    api "com.github.komputing.kethereum:model:$kethereum_version"
 
-    implementation "com.github.komputing.KEthereum:crypto:$kethereum_version"
-    implementation "com.github.komputing.KEthereum:extensions:$kethereum_version"
-    implementation "com.github.komputing.KEthereum:hashes:$kethereum_version"
+    implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
+    implementation "com.github.komputing.kethereum:extensions:$kethereum_version"
+    implementation "com.github.komputing.kethereum:hashes:$kethereum_version"
     api "com.github.uport-project.kotlin-common:signer-common:$kotlin_common_version"
     implementation "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
     implementation "com.madgag.spongycastle:prov:$spongycastle_version"
@@ -73,9 +73,9 @@ dependencies {
     androidTestImplementation "com.android.support.test:rules:$test_rules_version"
     androidTestImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     androidTestImplementation "com.github.uport-project.kotlin-common:test-helpers:$kotlin_common_version"
-    androidTestImplementation "com.github.komputing.KHex:extensions-jvm:$khex_version"
+    androidTestImplementation "com.github.komputing.khex:extensions-jvm:$khex_version"
 
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-    testImplementation "com.github.komputing.KEthereum:bip44:$kethereum_version"
-    testImplementation "com.github.komputing.KHex:extensions-jvm:$khex_version"
+    testImplementation "com.github.komputing.kethereum:bip44:$kethereum_version"
+    testImplementation "com.github.komputing.khex:extensions-jvm:$khex_version"
 }

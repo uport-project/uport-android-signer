@@ -64,9 +64,9 @@ dependencies {
 
     //used to generate and encode seeds to demonstrate importing them
     implementation "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
-    implementation "com.github.komputing.KHex:extensions-jvm:$khex_version"
-    implementation "com.github.komputing.KEthereum:bip39:$kethereum_version"
-    implementation "com.github.komputing.KEthereum:bip39_wordlist_en:$kethereum_version"
+    implementation "com.github.komputing.khex:extensions-jvm:$khex_version"
+    implementation "com.github.komputing.kethereum:bip39:$kethereum_version"
+    implementation "com.github.komputing.kethereum:bip39_wordlist_en:$kethereum_version"
 
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
 
