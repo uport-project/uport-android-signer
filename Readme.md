@@ -159,6 +159,9 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 ### Changelog
 
+#### 0.3.6
+* [support] bump kethereum to 0.76.2 and use lowercase imports ( a4ae6c16 )
+
 #### 0.3.5
 * [feat] add `suspend` extension for `UportHDSigner.signTransaction()` (#21)
 
