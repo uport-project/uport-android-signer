@@ -23,7 +23,6 @@ class DerivationTest {
             assertEquals(it.expectedPrivateKey, obtainedPrv)
 
             counter++
-
         }
 
         System.out.println("Derived $counter keys, all checks out")

@@ -75,7 +75,7 @@ class ExtendedKeyTest {
 
     @Test
     fun createNonHardenedChildPublicKey() {
-        //Chain m/0
+        // Chain m/0
         val seed =
             "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542".hexToByteArray()
         val expectedExtendedPublicKey =
@@ -89,7 +89,7 @@ class ExtendedKeyTest {
 
     @Test
     fun createPrivateChildFromHardenedPath() {
-        //Chain m/0/2147483647'
+        // Chain m/0/2147483647'
 
         val seed =
             "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542".hexToByteArray()
@@ -103,14 +103,13 @@ class ExtendedKeyTest {
 
         val result = child2.serialize()
         assertEquals(expectedExtendedPrivateKey, result)
-
     }
 
     @Test
     fun createPublicChildFromHardenedPath() {
-        //Chain m/0/2147483647'
+        // Chain m/0/2147483647'
 
-        //because it's a hardened path, we have to derive the private child and serialize only the public part
+        // because it's a hardened path, we have to derive the private child and serialize only the public part
 
         val seed =
             "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542".hexToByteArray()
@@ -124,17 +123,16 @@ class ExtendedKeyTest {
 
         val result = child2.serialize(true)
         assertEquals(expectedExtendedPublicKey, result)
-
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failWhenDerivingPublicChildFromPublicHardened() {
 
-        //Chain m/2147483647'
+        // Chain m/2147483647'
         // hardened paths don't allow derivation starting from public keys
         val masterPub = Seed("whatever".toByteArray()).toExtendedKey(true)
 
-        //expect crash
+        // expect crash
         masterPub.generateChildKey(BIP44Element(true, 2147483647))
     }
 

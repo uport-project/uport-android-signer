@@ -30,7 +30,7 @@ buildscript {
         kbip44_version = "0.1"
         kotlin_common_version = "0.4.3"
 
-        current_release_version = "0.3.6"
+        current_release_version = "0.4.0"
     }
 
     repositories {
