@@ -3,8 +3,8 @@ package com.uport.sdk.signer.storage
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.support.annotation.VisibleForTesting
-import android.support.annotation.VisibleForTesting.PACKAGE_PRIVATE
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PACKAGE_PRIVATE
 
 /**
  * Meant to be an encrypted drop in replacement for [SharedPreferences]

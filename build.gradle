@@ -16,7 +16,7 @@ buildscript {
         test_runner_version = "1.0.2"
         test_rules_version = test_runner_version
         test_orchestrator_version = test_runner_version
-        espresso_version = "3.0.2"
+        espresso_version = "3.2.0"
         junit_version = "4.12"
         mockk_version = "1.9.3"
         assertk_version = "0.22"

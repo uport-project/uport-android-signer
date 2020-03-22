@@ -5,8 +5,8 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
+import androidx.appcompat.app.AppCompatActivity
 import com.uport.sdk.signer.DecryptionCallback
 import com.uport.sdk.signer.EncryptionCallback
 import com.uport.sdk.signer.R

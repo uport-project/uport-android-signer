@@ -1,6 +1,7 @@
 package com.uport.sdk.signer.testutil
 
-import android.support.test.InstrumentationRegistry
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.uport.sdk.signer.UportHDSigner
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.encryption.KeyProtection
@@ -15,7 +16,7 @@ fun ensureSeedIsImportedInTargetContext(
     phrase: String,
     level: KeyProtection.Level = KeyProtection.Level.SIMPLE
 ): String {
-    val targetContext = InstrumentationRegistry.getTargetContext()
+    val targetContext = getApplicationContext<Application>()
     val latch = CountDownLatch(1)
     lateinit var handle: String
     UportHDSigner().importHDSeed(targetContext, level, phrase) { err, rootAddress, _ ->
@@ -34,7 +35,7 @@ fun ensureKeyIsImportedInTargetContext(
     key: ByteArray,
     level: KeyProtection.Level = KeyProtection.Level.SIMPLE
 ): String {
-    val targetContext = InstrumentationRegistry.getTargetContext()
+    val targetContext = getApplicationContext<Application>()
     val latch = CountDownLatch(1)
     lateinit var handle: String
     UportSigner().saveKey(targetContext, level, key) { err, rootAddress, _ ->

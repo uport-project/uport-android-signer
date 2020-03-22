@@ -1,8 +1,9 @@
 package com.uport.sdk.signer.storage
 
+import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.support.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -17,7 +18,7 @@ class ProtectedSharedPreferencesTest {
 
     @Before
     fun before() {
-        context = InstrumentationRegistry.getTargetContext()
+        context = ApplicationProvider.getApplicationContext<Application>()
         val basePrefs = context.getSharedPreferences("test_prefs", MODE_PRIVATE)
         prefs = ProtectedSharedPreferences(context, basePrefs)
     }
@@ -269,7 +270,8 @@ class ProtectedSharedPreferencesTest {
     @Test
     fun returnsDefaultsWhenDecryptionFails() {
         val originalPrefs =
-            InstrumentationRegistry.getContext().getSharedPreferences("defaultable", MODE_PRIVATE)
+            ApplicationProvider.getApplicationContext<Application>()
+                .getSharedPreferences("defaultable", MODE_PRIVATE)
 
         val wrappedPrefs = ProtectedSharedPreferences(context, originalPrefs)
 

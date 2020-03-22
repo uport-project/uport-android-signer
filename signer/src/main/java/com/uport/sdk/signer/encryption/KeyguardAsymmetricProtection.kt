@@ -6,7 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.security.keystore.UserNotAuthenticatedException
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.uport.sdk.signer.DecryptionCallback
 import com.uport.sdk.signer.EncryptionCallback
 import com.uport.sdk.signer.UportSigner

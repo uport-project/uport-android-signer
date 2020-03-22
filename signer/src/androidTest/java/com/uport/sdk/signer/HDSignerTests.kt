@@ -1,8 +1,9 @@
 package com.uport.sdk.signer
 
+import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.support.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import assertk.assertThat
 import assertk.assertions.isNotNull
 import com.uport.sdk.signer.encryption.KeyProtection.Level.SIMPLE
@@ -41,7 +42,7 @@ class HDSignerTests {
 
     @Before
     fun runBeforeEachTest() {
-        context = InstrumentationRegistry.getTargetContext()
+        context = ApplicationProvider.getApplicationContext<Application>()
     }
 
     @Test
@@ -231,7 +232,7 @@ class HDSignerTests {
             "vessel ladder alter error federal sibling chat ability sun glass valve picture"
         val seedHandle = ensureSeedIsImportedInTargetContext(referencePhrase)
 
-        val prefs = InstrumentationRegistry.getTargetContext()
+        val prefs = ApplicationProvider.getApplicationContext<Application>()
             .getSharedPreferences("eth_signer_store", MODE_PRIVATE)
         prefs.edit().putString("seed-$seedHandle", "corrupted seed data").apply()
 

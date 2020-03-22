@@ -1,6 +1,7 @@
 package com.uport.sdk.signer
 
-import android.support.test.InstrumentationRegistry
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
 import com.uport.sdk.signer.encryption.KeyProtection
 import com.uport.sdk.signer.testutil.ensureKeyIsImportedInTargetContext
@@ -21,7 +22,7 @@ class UserInteractionContextTests {
     private val phrase = generateMnemonic(wordList = WORDLIST_ENGLISH)
     private val key = ByteArray(32).apply { SecureRandom().nextBytes(this) }
 
-    private val context = InstrumentationRegistry.getTargetContext()
+    private val context = ApplicationProvider.getApplicationContext<Application>()
 
     // import a key that needs user authentication
     private val seedHandle = ensureSeedIsImportedInTargetContext(phrase, KeyProtection.Level.PROMPT)

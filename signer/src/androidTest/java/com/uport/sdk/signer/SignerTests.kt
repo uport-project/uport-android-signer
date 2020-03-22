@@ -1,7 +1,8 @@
 package com.uport.sdk.signer
 
+import android.app.Application
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import com.uport.sdk.signer.encryption.KeyProtection
 import me.uport.sdk.core.decodeBase64
 import me.uport.sdk.core.hexToBigInteger
@@ -34,7 +35,7 @@ class SignerTests {
 
     @Before
     fun runBeforeEachTest() {
-        context = InstrumentationRegistry.getTargetContext()
+        context = ApplicationProvider.getApplicationContext<Application>()
     }
 
     @Test

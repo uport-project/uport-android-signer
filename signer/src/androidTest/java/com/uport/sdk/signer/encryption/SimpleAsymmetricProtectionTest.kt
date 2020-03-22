@@ -1,6 +1,7 @@
 package com.uport.sdk.signer.encryption
 
-import android.support.test.InstrumentationRegistry
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -12,7 +13,7 @@ class SimpleAsymmetricProtectionTest {
 
     @Test
     fun encryptDecryptRandomBlobsOfMultipleSizes() {
-        val context = InstrumentationRegistry.getTargetContext()
+        val context = ApplicationProvider.getApplicationContext<Application>()
         SimpleAsymmetricProtection().genKey(context)
 
         val textSize = listOf(128) // , 256, 512, 1024, 2048, 4096, 13, 1234, 6123)
