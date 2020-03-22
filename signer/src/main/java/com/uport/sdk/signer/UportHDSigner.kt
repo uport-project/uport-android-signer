@@ -31,8 +31,8 @@ class UportHDSigner : UportSigner() {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
 
         val allSeeds = prefs.all.keys
-                .filter { label -> label.startsWith(SEED_PREFIX) }
-                .filter { hasCorrespondingLevelKey(prefs, it) }
+            .filter { label -> label.startsWith(SEED_PREFIX) }
+            .filter { hasCorrespondingLevelKey(prefs, it) }
 
         return allSeeds.isNotEmpty()
     }
@@ -54,7 +54,6 @@ class UportHDSigner : UportSigner() {
         val seedPhrase = entropyToMnemonic(entropyBuffer, WORDLIST_ENGLISH)
 
         return importHDSeed(context, level, seedPhrase, callback)
-
     }
 
     /**
@@ -88,13 +87,14 @@ class UportHDSigner : UportSigner() {
 
             val label = asSeedLabel(address)
 
-            storeEncryptedPayload(context,
-                    level,
-                    label,
-                    entropyBuffer
+            storeEncryptedPayload(
+                context,
+                level,
+                label,
+                entropyBuffer
             ) { err, _ ->
 
-                //empty memory
+                // empty memory
                 entropyBuffer.fill(0)
 
                 if (err != null) {
@@ -114,11 +114,11 @@ class UportHDSigner : UportSigner() {
     fun deleteSeed(context: Context, label: String) {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
         prefs.edit()
-                //store encrypted privateKey
-                .remove(asSeedLabel(label))
-                //mark the key as encrypted with provided security level
-                .remove(asLevelLabel(label))
-                .apply()
+            // store encrypted privateKey
+            .remove(asSeedLabel(label))
+            // mark the key as encrypted with provided security level
+            .remove(asLevelLabel(label))
+            .apply()
     }
 
     /**
@@ -148,10 +148,13 @@ class UportHDSigner : UportSigner() {
         callback: (err: Exception?, sigData: SignatureData) -> Unit
     ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
-            //storage error is also thrown if the root seed does not exist
+            // storage error is also thrown if the root seed does not exist
             return callback(storageError, EMPTY_SIGNATURE_DATA)
         }
 
@@ -172,13 +175,10 @@ class UportHDSigner : UportSigner() {
 
                 val sigData = keyPair.signMessage(txBytes)
                 return@decrypt callback(null, sigData)
-
             } catch (signError: Exception) {
                 return@decrypt callback(signError, EMPTY_SIGNATURE_DATA)
             }
-
         }
-
     }
 
     /**
@@ -208,7 +208,10 @@ class UportHDSigner : UportSigner() {
         callback: (err: Exception?, sigData: SignatureData) -> Unit
     ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
             return callback(storageError, SignatureData())
@@ -251,7 +254,10 @@ class UportHDSigner : UportSigner() {
         callback: (err: Exception?, address: String, pubKey: String) -> Unit
     ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
             return callback(storageError, "", "")
@@ -273,12 +279,10 @@ class UportHDSigner : UportSigner() {
                 val address: String = keyPair.toAddress().hex
 
                 return@decrypt callback(null, address, publicKeyString)
-
             } catch (derivationError: Exception) {
                 return@decrypt callback(derivationError, "", "")
             }
         }
-
     }
 
     /**
@@ -295,7 +299,10 @@ class UportHDSigner : UportSigner() {
         callback: (err: Exception?, phrase: String) -> Unit
     ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
             return callback(storageError, "")
@@ -326,13 +333,13 @@ class UportHDSigner : UportSigner() {
     fun allHDRoots(context: Context): List<String> {
 
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
-        //list all stored keys, keep a list of what looks like uport root addresses
+        // list all stored keys, keep a list of what looks like uport root addresses
         return prefs.all.keys
-                .asSequence()
-                .filter { label -> label.startsWith(SEED_PREFIX) }
-                .filter { hasCorrespondingLevelKey(prefs, it) }
-                .map { label: String -> label.substring(SEED_PREFIX.length) }
-                .toList()
+            .asSequence()
+            .filter { label -> label.startsWith(SEED_PREFIX) }
+            .filter { hasCorrespondingLevelKey(prefs, it) }
+            .map { label: String -> label.substring(SEED_PREFIX.length) }
+            .toList()
     }
 
     companion object {

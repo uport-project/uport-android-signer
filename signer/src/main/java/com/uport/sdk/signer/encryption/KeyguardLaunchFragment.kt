@@ -1,4 +1,5 @@
 @file:Suppress("SameParameterValue")
+
 package com.uport.sdk.signer.encryption
 
 import android.annotation.SuppressLint
@@ -56,7 +57,7 @@ class KeyguardLaunchFragment : Fragment() {
         val ctx = context
         if (ctx != null) {
             val resolveInfos = ctx.packageManager
-                    .queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY)
+                .queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY)
             for (i in resolveInfos.indices) {
                 return resolveInfos[i].activityInfo.packageName
             }
@@ -93,8 +94,9 @@ class KeyguardLaunchFragment : Fragment() {
 
         fun show(fragManager: FragmentManager, purpose: String, callback: KeyguardCallback) {
 
-            //cleanup..
-            val headlessFragment = fragManager.findFragmentByTag(TAG_KEYGUARD_FRAGMENT) as KeyguardLaunchFragment?
+            // cleanup..
+            val headlessFragment =
+                fragManager.findFragmentByTag(TAG_KEYGUARD_FRAGMENT) as KeyguardLaunchFragment?
             if (headlessFragment != null) {
                 fragManager.beginTransaction().remove(headlessFragment).commitAllowingStateLoss()
             }

@@ -1,5 +1,4 @@
 @file:Suppress("DEPRECATION", "MagicNumber")
-
 package com.uport.sdk.signer.encryption
 
 import android.animation.Animator
@@ -44,9 +43,10 @@ class FingerprintDialog : DialogFragment() {
         retainInstance = true
 
         purpose = savedInstanceState?.getString(KEY_DIALOG_PURPOSE)
-                ?: arguments?.getString(KEY_DIALOG_PURPOSE) ?: ""
+            ?: arguments?.getString(KEY_DIALOG_PURPOSE) ?: ""
 
-        fingerprintManager = context?.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+        fingerprintManager =
+            context?.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
         successColor = context?.getColor(R.color.uport_fingerprint_green) ?: Color.GREEN
         failureColor = context?.getColor(R.color.uport_fingerprint_red) ?: Color.RED
     }
@@ -61,14 +61,20 @@ class FingerprintDialog : DialogFragment() {
         // Check if a valid CryptoObject has been provided
         try {
             // Start listening for fingerprint events
-            fingerprintManager.authenticate(cryptoObject, cancellationSignal, 0, AuthCallbacks(), null)
+            fingerprintManager.authenticate(
+                cryptoObject,
+                cancellationSignal,
+                0,
+                AuthCallbacks(),
+                null
+            )
         } catch (e: IllegalArgumentException) {
             // Should never be thrown since we have declared the USE_FINGERPRINT permission
             // in the manifest
         } catch (e: IllegalStateException) {
-            //nop
+            // nop
         } catch (e: SecurityException) {
-            //nop
+            // nop
         }
     }
 
@@ -81,7 +87,11 @@ class FingerprintDialog : DialogFragment() {
     }
 
     override
-    fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val content = inflater.inflate(R.layout.fragment_fingerprint, container)
 
         purposeTextView = content.findViewById(R.id.purpose)
@@ -132,8 +142,8 @@ class FingerprintDialog : DialogFragment() {
         textViewStatus.setTextColor(failureColor)
 
         imageViewStatus.animate()
-                .rotationBy(90f)
-                .setInterpolator(OvershootInterpolator(1.4f)).duration = ANIMATION_DURATION.toLong()
+            .rotationBy(90f)
+            .setInterpolator(OvershootInterpolator(1.4f)).duration = ANIMATION_DURATION.toLong()
     }
 
     /**
@@ -146,29 +156,29 @@ class FingerprintDialog : DialogFragment() {
 
         imageViewStatus.rotation = 60f
         imageViewStatus.animate()
-                .rotation(0f)
-                .setInterpolator(DecelerateInterpolator(1.4f))
-                .setDuration(ANIMATION_DURATION.toLong())
-                .setListener(object : Animator.AnimatorListener {
-                    override fun onAnimationStart(animation: Animator) {
-                        // Empty
-                    }
+            .rotation(0f)
+            .setInterpolator(DecelerateInterpolator(1.4f))
+            .setDuration(ANIMATION_DURATION.toLong())
+            .setListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                    // Empty
+                }
 
-                    override fun onAnimationEnd(animation: Animator) {
-                        // Wait for the animation to finish, then dismiss the dialog and
-                        // invoke the callback method
-                        callbacks.onFingerprintSuccess(cryptoObject)
-                        dismiss()
-                    }
+                override fun onAnimationEnd(animation: Animator) {
+                    // Wait for the animation to finish, then dismiss the dialog and
+                    // invoke the callback method
+                    callbacks.onFingerprintSuccess(cryptoObject)
+                    dismiss()
+                }
 
-                    override fun onAnimationCancel(animation: Animator) {
-                        // Empty
-                    }
+                override fun onAnimationCancel(animation: Animator) {
+                    // Empty
+                }
 
-                    override fun onAnimationRepeat(animation: Animator) {
-                        // Empty
-                    }
-                })
+                override fun onAnimationRepeat(animation: Animator) {
+                    // Empty
+                }
+            })
     }
 
     /**
@@ -193,7 +203,7 @@ class FingerprintDialog : DialogFragment() {
 
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
             super.onAuthenticationError(errorCode, errString)
-            //TODO: if "too many attempts error occurs, ask for device unlock"
+            // TODO: if "too many attempts error occurs, ask for device unlock"
             showErrorText(errString)
         }
 
@@ -221,6 +231,5 @@ class FingerprintDialog : DialogFragment() {
             dialog.arguments = bundle
             return dialog
         }
-
     }
 }

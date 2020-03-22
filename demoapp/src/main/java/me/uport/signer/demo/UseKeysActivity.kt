@@ -33,10 +33,10 @@ class UseKeysActivity : AppCompatActivity(), KeyPairAdapter.ItemClickListener {
         adapter.setClickListener(this)
         recycler_view.adapter = adapter
 
-        val dividerItemDecoration = DividerItemDecoration(recycler_view.context,
-                (recycler_view.layoutManager as LinearLayoutManager).orientation)
+        val dividerItemDecoration = DividerItemDecoration(
+            recycler_view.context,
+            (recycler_view.layoutManager as LinearLayoutManager).orientation
+        )
         recycler_view.addItemDecoration(dividerItemDecoration)
-
     }
-
 }

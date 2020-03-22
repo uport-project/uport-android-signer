@@ -15,7 +15,7 @@ class SimpleAsymmetricProtectionTest {
         val context = InstrumentationRegistry.getTargetContext()
         SimpleAsymmetricProtection().genKey(context)
 
-        val textSize = listOf(128)//, 256, 512, 1024, 2048, 4096, 13, 1234, 6123)
+        val textSize = listOf(128) // , 256, 512, 1024, 2048, 4096, 13, 1234, 6123)
 
         textSize.forEach {
             val latch = CountDownLatch(1)

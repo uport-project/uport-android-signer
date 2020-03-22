@@ -1,61 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".PinGuardedKeyActivity"
-    tools:layout_editor_absoluteY="81dp">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".PinGuardedKeyActivity"
+        tools:layout_editor_absoluteY="81dp">
 
     <TextView
-        android:id="@+id/hardware_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="@+id/createKeyBtn"
-        app:layout_constraintStart_toStartOf="@+id/createKeyBtn"
-        app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/hardware_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/createKeyBtn"
+            app:layout_constraintStart_toStartOf="@+id/createKeyBtn"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/createKeyBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="1. Create a seed"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hardware_status" />
+            android:id="@+id/createKeyBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/_1_create_a_seed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/hardware_status" />
 
     <TextView
-        android:id="@+id/key_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="@+id/createKeyBtn"
-        app:layout_constraintStart_toStartOf="@+id/createKeyBtn"
-        app:layout_constraintTop_toBottomOf="@+id/createKeyBtn" />
+            android:id="@+id/key_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/createKeyBtn"
+            app:layout_constraintStart_toStartOf="@+id/createKeyBtn"
+            app:layout_constraintTop_toBottomOf="@+id/createKeyBtn" />
 
     <Button
-        android:id="@+id/signBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="2. Sign a random string"
-        app:layout_constraintEnd_toEndOf="@+id/key_status"
-        app:layout_constraintStart_toStartOf="@+id/key_status"
-        app:layout_constraintTop_toBottomOf="@+id/key_status" />
+            android:id="@+id/signBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/_2_sign_a_random_string"
+            app:layout_constraintEnd_toEndOf="@+id/key_status"
+            app:layout_constraintStart_toStartOf="@+id/key_status"
+            app:layout_constraintTop_toBottomOf="@+id/key_status" />
 
     <TextView
-        android:id="@+id/sign_result"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="@+id/signBtn"
-        app:layout_constraintStart_toStartOf="@+id/signBtn"
-        app:layout_constraintTop_toBottomOf="@+id/signBtn" />
+            android:id="@+id/sign_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/signBtn"
+            app:layout_constraintStart_toStartOf="@+id/signBtn"
+            app:layout_constraintTop_toBottomOf="@+id/signBtn" />
 </android.support.constraint.ConstraintLayout>

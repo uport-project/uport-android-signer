@@ -1,5 +1,4 @@
 @file:Suppress("DEPRECATION", "TooGenericExceptionCaught")
-
 package com.uport.sdk.signer.encryption
 
 import android.annotation.TargetApi
@@ -42,7 +41,12 @@ class FingerprintAsymmetricProtection : KeyProtection {
 
     @TargetApi(Build.VERSION_CODES.M)
     override
-    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
+    fun decrypt(
+        context: Context,
+        purpose: String,
+        ciphertext: String,
+        callback: DecryptionCallback
+    ) {
 
         try {
             val (_, encryptedBytes) = unpackCiphertext(ciphertext)
@@ -82,21 +86,23 @@ class FingerprintAsymmetricProtection : KeyProtection {
         if (activity.fragmentManager.findFragmentByTag(FingerprintDialog.TAG_FINGERPRINT_DIALOG) == null) {
             val cryptoObject = FingerprintManager.CryptoObject(cipher)
             fingerprintDialog.init(
-                    cryptoObject,
-                    object : FingerprintDialog.FingerprintDialogCallbacks {
-                        override fun onFingerprintSuccess(cryptoObject: FingerprintManager.CryptoObject) {
-                            callback(null, cryptoObject)
-                            fingerprintDialog.dismiss()
-                        }
-
-                        override fun onFingerprintCancel() {
-                            callback(RuntimeException(UportSigner.ERR_AUTH_CANCELED), cryptoObject)
-                            fingerprintDialog.dismiss()
-                        }
-
+                cryptoObject,
+                object : FingerprintDialog.FingerprintDialogCallbacks {
+                    override fun onFingerprintSuccess(cryptoObject: FingerprintManager.CryptoObject) {
+                        callback(null, cryptoObject)
+                        fingerprintDialog.dismiss()
                     }
+
+                    override fun onFingerprintCancel() {
+                        callback(RuntimeException(UportSigner.ERR_AUTH_CANCELED), cryptoObject)
+                        fingerprintDialog.dismiss()
+                    }
+                }
             )
-            fingerprintDialog.show(activity.supportFragmentManager, FingerprintDialog.TAG_FINGERPRINT_DIALOG)
+            fingerprintDialog.show(
+                activity.supportFragmentManager,
+                FingerprintDialog.TAG_FINGERPRINT_DIALOG
+            )
         }
     }
 }

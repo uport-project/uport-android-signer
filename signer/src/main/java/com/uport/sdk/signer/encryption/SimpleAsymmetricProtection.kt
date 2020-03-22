@@ -1,4 +1,5 @@
 @file:Suppress("TooGenericExceptionCaught")
+
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
@@ -15,9 +16,7 @@ class SimpleAsymmetricProtection : KeyProtection {
 
     override
     fun genKey(context: Context) {
-
         generateWrappingKey(context, alias)
-
     }
 
     override
@@ -31,7 +30,12 @@ class SimpleAsymmetricProtection : KeyProtection {
     }
 
     override
-    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
+    fun decrypt(
+        context: Context,
+        purpose: String,
+        ciphertext: String,
+        callback: DecryptionCallback
+    ) {
         try {
             val decryptedBytes = decryptRaw(ciphertext, alias)
             callback(null, decryptedBytes)

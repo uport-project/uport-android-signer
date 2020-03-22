@@ -30,7 +30,7 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
     private val appContext = context.applicationContext
 
-    //used for symmetric encryption on API 23+
+    // used for symmetric encryption on API 23+
     @TargetApi(Build.VERSION_CODES.M)
     private fun genEncryptionKey(): SecretKey {
         val keyGenerator = KeyGenerator.getInstance(ALGORITHM_AES, ANDROID_KEYSTORE_PROVIDER)
@@ -38,8 +38,8 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
         val builder = KeyGenParameterSpec.Builder(alias, purpose)
 
         builder.setBlockModes(BLOCK_MODE)
-                .setKeySize(AES_KEY_SIZE)
-                .setEncryptionPaddings(BLOCK_PADDING)
+            .setKeySize(AES_KEY_SIZE)
+            .setEncryptionPaddings(BLOCK_PADDING)
 
         keyGenerator.init(builder.build())
 
@@ -61,7 +61,7 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
             val secretKey = keyStore.getKey(alias, null) ?: genEncryptionKey()
             cipher.init(ENCRYPT_MODE, secretKey)
-            //FIXME: On some devices (like emulator with API 24 & 26) this throws
+            // FIXME: On some devices (like emulator with API 24 & 26) this throws
             // IllegalBlockSizeException for large blobs (ex 4096 bytes)
             val encryptedBytes = cipher.doFinal(blob)
 
@@ -69,7 +69,7 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
         } else {
             val oneTimeKey = genOneTimeKey()
 
-            //ensure public key exists
+            // ensure public key exists
             keyStore.getCertificate(alias)?.publicKey ?: generateWrappingKey(appContext, alias)
 
             val wrappingCipher = getWrappingCipher(WRAP_MODE, alias)
@@ -116,12 +116,13 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
         @SuppressLint("InlinedApi")
         private const val ALGORITHM_AES = KeyProperties.KEY_ALGORITHM_AES
+
         @SuppressLint("InlinedApi")
         private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
+
         @SuppressLint("InlinedApi")
         private const val BLOCK_PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
 
         private const val AES_TRANSFORMATION = "$ALGORITHM_AES/$BLOCK_MODE/$BLOCK_PADDING"
-
     }
 }

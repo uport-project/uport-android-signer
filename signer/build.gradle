@@ -1,5 +1,3 @@
-import java.time.temporal.TemporalAdjusters
-
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 apply plugin: "com.github.dcendents.android-maven"

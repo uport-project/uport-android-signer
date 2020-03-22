@@ -11,7 +11,10 @@ import java.util.concurrent.TimeUnit
 /**
  * synchronously imports a given seed phrase at the desired protection level
  */
-fun ensureSeedIsImportedInTargetContext(phrase: String, level: KeyProtection.Level = KeyProtection.Level.SIMPLE): String {
+fun ensureSeedIsImportedInTargetContext(
+    phrase: String,
+    level: KeyProtection.Level = KeyProtection.Level.SIMPLE
+): String {
     val targetContext = InstrumentationRegistry.getTargetContext()
     val latch = CountDownLatch(1)
     lateinit var handle: String
@@ -27,7 +30,10 @@ fun ensureSeedIsImportedInTargetContext(phrase: String, level: KeyProtection.Lev
 /**
  * synchronously imports a given private key at the desired protection level
  */
-fun ensureKeyIsImportedInTargetContext(key: ByteArray, level: KeyProtection.Level = KeyProtection.Level.SIMPLE): String {
+fun ensureKeyIsImportedInTargetContext(
+    key: ByteArray,
+    level: KeyProtection.Level = KeyProtection.Level.SIMPLE
+): String {
     val targetContext = InstrumentationRegistry.getTargetContext()
     val latch = CountDownLatch(1)
     lateinit var handle: String

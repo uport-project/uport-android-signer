@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="me.uport.signer.demo">
+        package="me.uport.signer.demo">
 
     <application
-        android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+            android:allowBackup="false"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
         <activity
-            android:name=".CreateKeysActivity"
-            android:label="@string/title_activity_create_keys"
-            android:theme="@style/AppTheme.NoActionBar" />
+                android:name=".CreateKeysActivity"
+                android:label="@string/title_activity_create_keys"
+                android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".UseKeysActivity"
-            android:label="@string/title_activity_use_keys" />
+                android:name=".UseKeysActivity"
+                android:label="@string/title_activity_use_keys" />
         <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
+                android:name=".MainActivity"
+                android:label="@string/title_activity_main"
+                android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

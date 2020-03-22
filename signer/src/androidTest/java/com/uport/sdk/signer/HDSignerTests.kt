@@ -8,9 +8,16 @@ import assertk.assertions.isNotNull
 import com.uport.sdk.signer.encryption.KeyProtection.Level.SIMPLE
 import com.uport.sdk.signer.testutil.ensureKeyIsImportedInTargetContext
 import com.uport.sdk.signer.testutil.ensureSeedIsImportedInTargetContext
-import me.uport.sdk.core.*
+import me.uport.sdk.core.decodeBase64
+import me.uport.sdk.core.hexToBigInteger
+import me.uport.sdk.core.hexToByteArray
+import me.uport.sdk.core.padBase64
+import me.uport.sdk.core.toBase64
 import me.uport.sdk.signer.decodeJose
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.kethereum.bip32.toKey
@@ -24,9 +31,9 @@ import java.util.concurrent.TimeUnit
 class HDSignerTests {
 
     init {
-        //KEthereum has some provider initialization code that is causing problems if that code is used before any hybrid encryption code
+        // KEthereum has some provider initialization code that is causing problems if that code is used before any hybrid encryption code
         // the failure shows up as "java.lang.AssertionError: expected null, but was:<java.lang.IllegalStateException: Can't generate certificate>"
-        //TODO: check back here when that is fixed: https://github.com/walleth/kethereum/issues/22
+        // TODO: check back here when that is fixed: https://github.com/walleth/kethereum/issues/22
         Security.addProvider(BouncyCastleProvider())
     }
 
@@ -88,7 +95,7 @@ class HDSignerTests {
         latch.await(20, TimeUnit.SECONDS)
     }
 
-    //JWT signing something using a derived uPort Root
+    // JWT signing something using a derived uPort Root
     @Test
     fun testJwtComponents() {
 
@@ -144,7 +151,6 @@ class HDSignerTests {
         }
 
         latch.await(20, TimeUnit.SECONDS)
-
     }
 
     @Test
@@ -153,7 +159,7 @@ class HDSignerTests {
             "idle giraffe soldier dignity angle tiger false finish busy glow ramp frog"
         val referenceRootAddress = ensureSeedIsImportedInTargetContext(referenceSeedPhrase)
 
-        //check that retrieving it yields the same phrase
+        // check that retrieving it yields the same phrase
         val latch = CountDownLatch(1)
         UportHDSigner().showHDSeed(context, referenceRootAddress, "") { ex, phrase ->
             assertNull(ex)
@@ -201,7 +207,9 @@ class HDSignerTests {
     @Test
     fun returns_error_when_signing_invalid_jwt_bundle() {
         val ref =
-            ensureKeyIsImportedInTargetContext("5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38".hexToByteArray())
+            ensureKeyIsImportedInTargetContext(
+                "5047c789919e943c559d8c134091d47b4642122ba0111dfa842ef6edefb48f38".hexToByteArray()
+            )
         val latch = CountDownLatch(1)
         UportSigner().signJwtBundle(
             context,
@@ -238,6 +246,5 @@ class HDSignerTests {
             latch.countDown()
         }
         latch.await()
-
     }
 }

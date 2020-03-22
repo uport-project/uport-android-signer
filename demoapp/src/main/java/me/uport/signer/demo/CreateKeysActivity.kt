@@ -26,7 +26,11 @@ class CreateKeysActivity : AppCompatActivity() {
 
         importButton.setOnClickListener { view ->
             val phrase = mnemonicPhraseField.text.toString()
-            UportHDSigner().importHDSeed(view.context, KeyProtection.Level.SIMPLE, phrase) { err, address, publicKey ->
+            UportHDSigner().importHDSeed(
+                view.context,
+                KeyProtection.Level.SIMPLE,
+                phrase
+            ) { err, address, publicKey ->
                 errorField.text = "error: ${err.toString()}"
                 publicKeyField.text = "publicKey: ${publicKey.decodeBase64().toHexString()}"
                 addressField.text = "address: $address"

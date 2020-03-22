@@ -34,7 +34,7 @@ class FingerprintGuardedKeyActivity : AppCompatActivity() {
         }
 
         createKeyBtn.setOnClickListener {
-            //KeyProtection.Level.PROMPT will default to Keyguard when no fingerprints are available
+            // KeyProtection.Level.PROMPT will default to Keyguard when no fingerprints are available
             UportHDSigner().createHDSeed(this, KeyProtection.Level.PROMPT) { err, address, _ ->
 
                 if (err != null) {
@@ -48,20 +48,20 @@ class FingerprintGuardedKeyActivity : AppCompatActivity() {
 
         signBtn.setOnClickListener {
 
-            //random payload to be signed
+            // random payload to be signed
             @Suppress("MagicNumber")
             val msgBytes = ByteArray(3139).also { Random().nextBytes(it) }
 
-            //needs to be wrapped as a base64 string
+            // needs to be wrapped as a base64 string
             val b64Payload = msgBytes.toBase64().padBase64()
 
             UportHDSigner().signTransaction(
-                    this,
-                    hdSeedHandle,
-                    "m/44'/60'/0'/0/0",
-                    b64Payload,
-                    "${getString(R.string.app_name)} is requesting your approval to sign a random " +
-                            "string of bits with a newly minted key"
+                this,
+                hdSeedHandle,
+                "m/44'/60'/0'/0/0",
+                b64Payload,
+                "${getString(R.string.app_name)} is requesting your approval to sign a random " +
+                        "string of bits with a newly minted key"
             ) { err, sigData ->
                 if (err == null) {
                     sign_result.text = "success : $sigData"
@@ -70,6 +70,5 @@ class FingerprintGuardedKeyActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 }

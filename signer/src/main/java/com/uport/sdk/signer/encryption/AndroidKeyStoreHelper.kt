@@ -46,24 +46,27 @@ object AndroidKeyStoreHelper {
      * [java.security.spec.AlgorithmParameterSpec] applied to the wrapping cipher on API 23+
      */
     private val OAEP_SPEC = OAEPParameterSpec(
-            "SHA-256", "MGF1",
-            MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT)
+        "SHA-256", "MGF1",
+        MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT
+    )
 
     /**
      * The cipher transformation used to wrap the protected key
      */
     private val WRAPPING_TRANSFORMATION =
-            if (hasMarshmallow()) {
-                "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
-            } else {
-                "RSA/ECB/PKCS1Padding"
-            }
+        if (hasMarshmallow()) {
+            "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
+        } else {
+            "RSA/ECB/PKCS1Padding"
+        }
 
-    @Throws(KeyStoreException::class,
-            NoSuchProviderException::class,
-            IOException::class,
-            NoSuchAlgorithmException::class,
-            CertificateException::class)
+    @Throws(
+        KeyStoreException::class,
+        NoSuchProviderException::class,
+        IOException::class,
+        NoSuchAlgorithmException::class,
+        CertificateException::class
+    )
     internal fun getKeyStore(): KeyStore {
         // Get a KeyStore instance with the Android Keystore provider.
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_PROVIDER)
@@ -74,16 +77,18 @@ object AndroidKeyStoreHelper {
         return keyStore
     }
 
-    @Throws(KeyPermanentlyInvalidatedException::class,
-            KeyStoreException::class,
-            CertificateException::class,
-            UnrecoverableKeyException::class,
-            IOException::class,
-            NoSuchAlgorithmException::class,
-            InvalidKeyException::class,
-            InvalidAlgorithmParameterException::class,
-            NoSuchProviderException::class,
-            NoSuchPaddingException::class)
+    @Throws(
+        KeyPermanentlyInvalidatedException::class,
+        KeyStoreException::class,
+        CertificateException::class,
+        UnrecoverableKeyException::class,
+        IOException::class,
+        NoSuchAlgorithmException::class,
+        InvalidKeyException::class,
+        InvalidAlgorithmParameterException::class,
+        NoSuchProviderException::class,
+        NoSuchPaddingException::class
+    )
     fun getWrappingCipher(mode: Int, keyAlias: String): Cipher {
 
         val keyStore = getKeyStore()
@@ -99,7 +104,7 @@ object AndroidKeyStoreHelper {
                 val pubKey = keyStore.getCertificate(keyAlias).publicKey
                 // due to a bug in API23, the public key needs to be separated from the keystore
                 KeyFactory.getInstance(pubKey.algorithm)
-                        .generatePublic(X509EncodedKeySpec(pubKey.encoded)) as PublicKey
+                    .generatePublic(X509EncodedKeySpec(pubKey.encoded)) as PublicKey
             }
         }
 

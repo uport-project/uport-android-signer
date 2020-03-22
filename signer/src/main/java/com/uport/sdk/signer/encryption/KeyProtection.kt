@@ -45,15 +45,27 @@ interface KeyProtection {
     }
 
     fun genKey(context: Context)
-    fun encrypt(context: Context, purpose: String = "", blob: ByteArray, callback: EncryptionCallback)
-    fun decrypt(context: Context, purpose: String = "", ciphertext: String, callback: DecryptionCallback)
+    fun encrypt(
+        context: Context,
+        purpose: String = "",
+        blob: ByteArray,
+        callback: EncryptionCallback
+    )
+
+    fun decrypt(
+        context: Context,
+        purpose: String = "",
+        ciphertext: String,
+        callback: DecryptionCallback
+    )
 
     val alias: String
 
     companion object {
 
         fun canUseKeychainAuthentication(context: Context): Boolean {
-            val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            val keyguardManager =
+                context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             // TODO: prompt user to setup keyguard
             return keyguardManager.isKeyguardSecure
         }
@@ -61,12 +73,13 @@ interface KeyProtection {
         @Suppress("NewApi", "ReturnCount")
         fun hasSetupFingerprint(context: Context): Boolean {
             if (hasMarshmallow()) {
-                val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                val mFingerprintManager =
+                    context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
                 try {
                     if (!mFingerprintManager.isHardwareDetected) {
                         return false
                     } else if (!mFingerprintManager.hasEnrolledFingerprints()) {
-                        //TODO: prompt user to enroll fingerprints
+                        // TODO: prompt user to enroll fingerprints
                         return false
                     }
                 } catch (e: SecurityException) {
@@ -84,7 +97,8 @@ interface KeyProtection {
         @Suppress("NewApi")
         fun hasFingerprintHardware(context: Context): Boolean {
             return if (hasMarshmallow()) {
-                val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                val mFingerprintManager =
+                    context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
                 try {
                     mFingerprintManager.isHardwareDetected
                 } catch (e: SecurityException) {
