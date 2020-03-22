@@ -1,5 +1,3 @@
-import java.time.temporal.TemporalAdjusters
-
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 apply plugin: "com.github.dcendents.android-maven"
@@ -11,14 +9,13 @@ android {
     compileSdkVersion compile_sdk_version
     buildToolsVersion build_tools_version
 
-
     defaultConfig {
         minSdkVersion min_sdk_version
         targetSdkVersion target_sdk_version
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         testApplicationId "com.uport.sdk.signer.test"
         // The following argument makes the Android Test Orchestrator run its
         // "pm clear" command after each test invocation. This command ensures
@@ -54,7 +51,7 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
-    implementation "com.android.support:appcompat-v7:$support_lib_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
 
     implementation "com.github.komputing.kethereum:bip39:$kethereum_version"
     implementation "com.github.komputing.kethereum:bip32:$kethereum_version"
@@ -63,19 +60,19 @@ dependencies {
     api "com.github.komputing.kethereum:model:$kethereum_version"
 
     implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
-    implementation "com.github.komputing.kethereum:extensions:$kethereum_version"
-    implementation "com.github.komputing.kethereum:hashes:$kethereum_version"
+    implementation "com.github.komputing.kethereum:extensions_kotlin:$kethereum_version"
+    implementation "com.github.komputing.khash:sha256:$khash_version"
     api "com.github.uport-project.kotlin-common:signer-common:$kotlin_common_version"
     implementation "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
     implementation "com.madgag.spongycastle:prov:$spongycastle_version"
 
-    androidTestImplementation "com.android.support.test:runner:$test_runner_version"
-    androidTestImplementation "com.android.support.test:rules:$test_rules_version"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     androidTestImplementation "com.github.uport-project.kotlin-common:test-helpers:$kotlin_common_version"
-    androidTestImplementation "com.github.komputing.khex:extensions-jvm:$khex_version"
+    androidTestImplementation "com.github.komputing.khex:extensions:$khex_version"
 
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-    testImplementation "com.github.komputing.kethereum:bip44:$kethereum_version"
-    testImplementation "com.github.komputing.khex:extensions-jvm:$khex_version"
+    testImplementation "com.github.komputing:kbip44:$kbip44_version"
+    testImplementation "com.github.komputing.khex:extensions:$khex_version"
 }

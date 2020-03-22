@@ -1,3 +1,5 @@
+@file:Suppress("SameParameterValue")
+
 package com.uport.sdk.signer.encryption
 
 import android.annotation.SuppressLint
@@ -7,8 +9,8 @@ import android.content.Context.KEYGUARD_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.uport.sdk.signer.hasMarshmallow
 
 class KeyguardLaunchFragment : Fragment() {
@@ -55,7 +57,7 @@ class KeyguardLaunchFragment : Fragment() {
         val ctx = context
         if (ctx != null) {
             val resolveInfos = ctx.packageManager
-                    .queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY)
+                .queryIntentActivities(intent, PackageManager.MATCH_SYSTEM_ONLY)
             for (i in resolveInfos.indices) {
                 return resolveInfos[i].activityInfo.packageName
             }
@@ -92,8 +94,9 @@ class KeyguardLaunchFragment : Fragment() {
 
         fun show(fragManager: FragmentManager, purpose: String, callback: KeyguardCallback) {
 
-            //cleanup..
-            val headlessFragment = fragManager.findFragmentByTag(TAG_KEYGUARD_FRAGMENT) as KeyguardLaunchFragment?
+            // cleanup..
+            val headlessFragment =
+                fragManager.findFragmentByTag(TAG_KEYGUARD_FRAGMENT) as KeyguardLaunchFragment?
             if (headlessFragment != null) {
                 fragManager.beginTransaction().remove(headlessFragment).commitAllowingStateLoss()
             }
@@ -102,7 +105,5 @@ class KeyguardLaunchFragment : Fragment() {
             fragment.init(purpose, callback)
             fragManager.beginTransaction().add(fragment, TAG_KEYGUARD_FRAGMENT).commit()
         }
-
-
     }
 }

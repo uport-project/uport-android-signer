@@ -1,6 +1,7 @@
 package com.uport.sdk.signer
 
-import android.support.test.InstrumentationRegistry
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
 import com.uport.sdk.signer.encryption.KeyProtection
 import com.uport.sdk.signer.testutil.ensureKeyIsImportedInTargetContext
@@ -21,8 +22,9 @@ class UserInteractionContextTests {
     private val phrase = generateMnemonic(wordList = WORDLIST_ENGLISH)
     private val key = ByteArray(32).apply { SecureRandom().nextBytes(this) }
 
-    private val context = InstrumentationRegistry.getTargetContext()
-    //import a key that needs user authentication
+    private val context = ApplicationProvider.getApplicationContext<Application>()
+
+    // import a key that needs user authentication
     private val seedHandle = ensureSeedIsImportedInTargetContext(phrase, KeyProtection.Level.PROMPT)
     private val keyHandle = ensureKeyIsImportedInTargetContext(key, KeyProtection.Level.PROMPT)
 
@@ -48,7 +50,13 @@ class UserInteractionContextTests {
         val payload = somePayloadData.toBase64().padBase64()
 
         val latch = CountDownLatch(1)
-        UportHDSigner().signJwtBundle(context, seedHandle, UportHDSigner.UPORT_ROOT_DERIVATION_PATH, payload, "this is shown to the user") { err, _ ->
+        UportHDSigner().signJwtBundle(
+            context,
+            seedHandle,
+            UportHDSigner.UPORT_ROOT_DERIVATION_PATH,
+            payload,
+            "this is shown to the user"
+        ) { err, _ ->
 
             assertNotNull(err!!)
             assertTrue(err.message?.contains(ERR_ACTIVITY_DOES_NOT_EXIST) ?: false)
@@ -66,7 +74,13 @@ class UserInteractionContextTests {
         val payload = somePayloadData.toBase64().padBase64()
 
         val latch = CountDownLatch(1)
-        UportHDSigner().signTransaction(context, seedHandle, UportHDSigner.UPORT_ROOT_DERIVATION_PATH, payload, "this is shown to the user") { err, _ ->
+        UportHDSigner().signTransaction(
+            context,
+            seedHandle,
+            UportHDSigner.UPORT_ROOT_DERIVATION_PATH,
+            payload,
+            "this is shown to the user"
+        ) { err, _ ->
 
             assertNotNull(err!!)
             assertTrue(err.message?.contains(ERR_ACTIVITY_DOES_NOT_EXIST) ?: false)
@@ -77,7 +91,6 @@ class UserInteractionContextTests {
         latch.await(20, TimeUnit.SECONDS)
     }
 
-
     @Test
     fun shouldThrowOnSignJwtSimpleWhenUsingActivityDependentKey() {
 
@@ -85,7 +98,12 @@ class UserInteractionContextTests {
         val payload = somePayloadData.toBase64().padBase64()
 
         val latch = CountDownLatch(1)
-        UportSigner().signJwtBundle(context, keyHandle, payload, "this is shown to the user") { err, _ ->
+        UportSigner().signJwtBundle(
+            context,
+            keyHandle,
+            payload,
+            "this is shown to the user"
+        ) { err, _ ->
 
             assertNotNull(err!!)
             assertTrue(err.message?.contains(ERR_ACTIVITY_DOES_NOT_EXIST) ?: false)
@@ -103,7 +121,12 @@ class UserInteractionContextTests {
         val payload = somePayloadData.toBase64().padBase64()
 
         val latch = CountDownLatch(1)
-        UportSigner().signTransaction(context, keyHandle, payload, "this is shown to the user") { err, _ ->
+        UportSigner().signTransaction(
+            context,
+            keyHandle,
+            payload,
+            "this is shown to the user"
+        ) { err, _ ->
 
             assertNotNull(err!!)
             assertTrue(err.message?.contains(ERR_ACTIVITY_DOES_NOT_EXIST) ?: false)
@@ -113,5 +136,4 @@ class UserInteractionContextTests {
 
         latch.await(20, TimeUnit.SECONDS)
     }
-
 }

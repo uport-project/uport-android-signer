@@ -3,4 +3,13 @@
     <string name="title_activity_main">Uport Signer Demo</string>
     <string name="title_activity_create_keys">Create or import</string>
     <string name="title_activity_use_keys">HD roots</string>
+    <string name="generate_new">Generate new</string>
+    <string name="import_key">Import</string>
+    <string name="mnemonic_phrase">mnemonic phrase</string>
+    <string name="create_keys">Create Keys</string>
+    <string name="use_keys">Use Keys</string>
+    <string name="use_keyguard">use keyguard</string>
+    <string name="use_fingerprint">use fingerprint</string>
+    <string name="_1_create_a_seed">1. Create a seed</string>
+    <string name="_2_sign_a_random_string">2. Sign a random string</string>
 </resources>

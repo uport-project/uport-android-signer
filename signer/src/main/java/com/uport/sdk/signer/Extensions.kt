@@ -11,15 +11,15 @@ private const val DELIMITER = "]"
  * packs elements of an encryption operation into a string meant to be saved to disk
  */
 fun packCiphertext(vararg data: ByteArray): String =
-        data.joinToString(DELIMITER) { it.toBase64().padBase64() }
+    data.joinToString(DELIMITER) { it.toBase64().padBase64() }
 
 /**
  * unpacks the elements of an encryption op into individual components so they may be used to decrypt
  */
 fun unpackCiphertext(ciphertext: String): List<ByteArray> =
-        ciphertext
-                .split(DELIMITER)
-                .map { it.decodeBase64() }
+    ciphertext
+        .split(DELIMITER)
+        .map { it.decodeBase64() }
 
 /**
  * shorthand for checking if this code is running on android M or later

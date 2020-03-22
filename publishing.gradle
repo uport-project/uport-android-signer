@@ -2,7 +2,6 @@
 // bintray_api_key
 // bintray_username
 
-
 def gitUrl = "https://github.com/uport-project/uport-android-signer.git"
 def groupID = "com.github.uport-project.uport-android-signer"
 def siteUrl = "https://developer.uport.me"
@@ -58,7 +57,7 @@ subprojects { subproject ->
             }
 
             task sourcesJar(type: Jar) {
-                classifier = 'sources'
+                archiveClassifier.set('sources')
                 if (subproject.hasProperty("android")) {
                     from android.sourceSets.main.javaDirectories
                 } else {
