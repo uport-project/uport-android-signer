@@ -19,7 +19,7 @@ buildscript {
         espresso_version = "3.0.2"
         junit_version = "4.12"
         mockk_version = "1.9.3"
-        assertk_version = "0.13"
+        assertk_version = "0.22"
         detekt_version = "1.7.0"
         jacoco_version = "0.8.4"
 
