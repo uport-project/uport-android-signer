@@ -20,11 +20,11 @@ import org.kethereum.crypto.signMessageHash
 import org.kethereum.crypto.toAddress
 import org.kethereum.crypto.toECKeyPair
 import org.kethereum.extensions.toBytesPadded
-import org.kethereum.hashes.sha256
 import org.kethereum.model.ECKeyPair
 import org.kethereum.model.PRIVATE_KEY_SIZE
 import org.kethereum.model.PrivateKey
 import org.kethereum.model.SignatureData
+import org.komputing.khash.sha256.extensions.sha256
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.math.BigInteger
 import java.security.InvalidKeyException
