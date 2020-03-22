@@ -109,7 +109,7 @@ open class UportSigner {
             privateKeyBytes
         ) { encryptionError, _ ->
 
-            //empty memory
+            // empty memory
             privateKeyBytes.fill(0)
 
             if (encryptionError != null) {
@@ -184,13 +184,10 @@ open class UportSigner {
 
                 val sigData = keyPair.signMessage(txBytes)
                 return@decrypt callback(null, sigData)
-
             } catch (signError: Exception) {
                 return@decrypt callback(signError, EMPTY_SIGNATURE_DATA)
             }
-
         }
-
     }
 
     /**
@@ -201,9 +198,8 @@ open class UportSigner {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
 
         return try {
-            //check if label is tracked
-            val keyExists = (prefs.contains(asLevelLabel(label))
-                    && prefs.contains(label))
+            // check if label is tracked
+            val keyExists = (prefs.contains(asLevelLabel(label)) && prefs.contains(label))
 
             if (!keyExists) {
                 throw InvalidKeyException(ERR_KEY_NOT_REGISTERED)
@@ -213,12 +209,11 @@ open class UportSigner {
             val level = KeyProtection.Level.valueOf(levelName)
             val encryptionLayer = KeyProtectionFactory.obtain(context, level)
 
-            //read encrypted payload from storage
+            // read encrypted payload from storage
             val encryptedPayload = prefs.getString(label, null)
                 ?: throw InvalidKeyException(ERR_KEY_CORRUPTED)
 
             EncryptionCombo(encryptionLayer, encryptedPayload, null)
-
         } catch (ex: Exception) {
             EncryptionCombo(SimpleAsymmetricProtection(), "", ex)
         }
@@ -290,7 +285,7 @@ open class UportSigner {
     fun allAddresses(context: Context, callback: (addresses: List<String>) -> Unit) {
 
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
-        //list all stored keys, keep a list of what looks like addresses
+        // list all stored keys, keep a list of what looks like addresses
         val addresses = prefs.all.keys
             .filter { label -> label.startsWith(ADDRESS_PREFIX) }
             .filter { hasCorrespondingLevelKey(prefs, it) }
@@ -327,9 +322,9 @@ open class UportSigner {
                     return@encrypt callback(err, false)
                 }
                 prefs.edit()
-                    //store encrypted privatekey
+                    // store encrypted privatekey
                     .putString(label, ciphertext)
-                    //mark the key as encrypted with provided security level
+                    // mark the key as encrypted with provided security level
                     .putString(asLevelLabel(label), keyLevel.name)
                     .apply()
                 return@encrypt callback(null, true)
@@ -366,7 +361,7 @@ open class UportSigner {
             return callback(storageError, ByteArray(0))
         }
 
-        //decrypt using the appropriate level
+        // decrypt using the appropriate level
         encryptionLayer.decrypt(context, prompt, encryptedPayload) { err, decrypted ->
             if (err != null) {
                 return@decrypt callback(err, ByteArray(0))
@@ -428,8 +423,5 @@ open class UportSigner {
 
         internal val EMPTY_SIGNATURE_DATA =
             SignatureData(BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO)
-
     }
-
 }
-

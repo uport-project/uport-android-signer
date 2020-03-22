@@ -13,7 +13,6 @@ import kotlin.coroutines.suspendCoroutine
  *
  * Exposes some HD key provider async methods as coroutines
  */
-
 suspend fun UportHDSigner.createHDSeed(
     context: Context,
     level: KeyProtection.Level

@@ -30,7 +30,7 @@ allprojects {
 ```
 in your app `build.gradle`:
 ```groovy
-uport_signer_version = "0.3.4"
+uport_signer_version = "0.4.0"
 dependencies {
     //...
     implementation "com.github.uport-project:uport-android-signer:$uport_signer_version"
@@ -161,6 +161,11 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 ```
 
 ### Changelog
+
+#### 0.4.0
+* [support] bump kethereum to 0.81.4 (#24)
+* [support] migrate project to androidX (cc817722)
+* [refactor] reformat code & enforce detekt linter (#25)
 
 #### 0.3.6
 * [support] bump kethereum to 0.76.2 and use lowercase imports ( a4ae6c16 )
