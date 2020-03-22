@@ -1,7 +1,5 @@
 package com.uport.sdk.signer.testutil
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 
-class TestDummyActivity : AppCompatActivity() {
-
-}
+class TestDummyActivity : AppCompatActivity()

@@ -1,3 +1,5 @@
+@file:Suppress("TooGenericExceptionCaught", "LongParameterList", "MagicNumber")
+
 package com.uport.sdk.signer
 
 import android.content.Context
@@ -29,8 +31,8 @@ class UportHDSigner : UportSigner() {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
 
         val allSeeds = prefs.all.keys
-                .filter { label -> label.startsWith(SEED_PREFIX) }
-                .filter { hasCorrespondingLevelKey(prefs, it) }
+            .filter { label -> label.startsWith(SEED_PREFIX) }
+            .filter { hasCorrespondingLevelKey(prefs, it) }
 
         return allSeeds.isNotEmpty()
     }
@@ -40,7 +42,11 @@ class UportHDSigner : UportSigner() {
      * Calls back with the seed handle ([rootAddress]) and the Base64 encoded
      * [pubKey] corresponding to it, or a non-null [err] if something broke
      */
-    fun createHDSeed(context: Context, level: KeyProtection.Level, callback: (err: Exception?, rootAddress: String, pubKey: String) -> Unit) {
+    fun createHDSeed(
+        context: Context,
+        level: KeyProtection.Level,
+        callback: (err: Exception?, rootAddress: String, pubKey: String) -> Unit
+    ) {
 
         val entropyBuffer = ByteArray(128 / 8)
         SecureRandom().nextBytes(entropyBuffer)
@@ -48,7 +54,6 @@ class UportHDSigner : UportSigner() {
         val seedPhrase = entropyToMnemonic(entropyBuffer, WORDLIST_ENGLISH)
 
         return importHDSeed(context, level, seedPhrase, callback)
-
     }
 
     /**
@@ -56,12 +61,18 @@ class UportHDSigner : UportSigner() {
      * The phrase is converted to its binary representation using bip39 rules
      * and stored at the provided [level] of encryption.
      *
-     * A rootAddress is derived from the phrase and will be used to refer to this imported phrase for future signing.
+     * A rootAddress is derived from the phrase and will be used to refer to this imported
+     * phrase for future signing.
      *
      * Then calls back with the derived 0x `rootAddress` and base64 encoded `public Key`
      * or a non-null err in case something goes wrong
      */
-    fun importHDSeed(context: Context, level: KeyProtection.Level, phrase: String, callback: (err: Exception?, address: String, pubKey: String) -> Unit) {
+    fun importHDSeed(
+        context: Context,
+        level: KeyProtection.Level,
+        phrase: String,
+        callback: (err: Exception?, address: String, pubKey: String) -> Unit
+    ) {
 
         try {
             val entropyBuffer = mnemonicToEntropy(phrase, WORDLIST_ENGLISH)
@@ -76,13 +87,14 @@ class UportHDSigner : UportSigner() {
 
             val label = asSeedLabel(address)
 
-            storeEncryptedPayload(context,
-                    level,
-                    label,
-                    entropyBuffer
+            storeEncryptedPayload(
+                context,
+                level,
+                label,
+                entropyBuffer
             ) { err, _ ->
 
-                //empty memory
+                // empty memory
                 entropyBuffer.fill(0)
 
                 if (err != null) {
@@ -102,13 +114,12 @@ class UportHDSigner : UportSigner() {
     fun deleteSeed(context: Context, label: String) {
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
         prefs.edit()
-                //store encrypted privatekey
-                .remove(asSeedLabel(label))
-                //mark the key as encrypted with provided security level
-                .remove(asLevelLabel(label))
-                .apply()
+            // store encrypted privateKey
+            .remove(asSeedLabel(label))
+            // mark the key as encrypted with provided security level
+            .remove(asLevelLabel(label))
+            .apply()
     }
-
 
     /**
      * Signs a transaction bundle using a key derived from a previously imported/created seed.
@@ -120,19 +131,30 @@ class UportHDSigner : UportSigner() {
      * The decryption UI can be a device lockscreen or fingerprint-dialog depending on the level of encryption
      * requested at seed creation/import.
      *
-     * @param context The android activity from which the signature is requested or app context if it's encrypted using [KeyProtection.Level.SIMPLE]] protection
+     * @param context The android activity from which the signature is requested or app context if
+     * it's encrypted using [KeyProtection.Level.SIMPLE]] protection
      * @param rootAddress the 0x ETH address used to refer to the previously imported/created seed
      * @param txPayload the base64 encoded byte array that represents the message to be signed
      * @param prompt A string that needs to be displayed to the user in case user-auth is requested
      * @param callback (error, signature) called after the transaction has been signed successfully or
      * with an error and empty data when it fails
      */
-    fun signTransaction(context: Context, rootAddress: String, derivationPath: String, txPayload: String, prompt: String, callback: (err: Exception?, sigData: SignatureData) -> Unit) {
+    fun signTransaction(
+        context: Context,
+        rootAddress: String,
+        derivationPath: String,
+        txPayload: String,
+        prompt: String,
+        callback: (err: Exception?, sigData: SignatureData) -> Unit
+    ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
-            //storage error is also thrown if the root seed does not exist
+            // storage error is also thrown if the root seed does not exist
             return callback(storageError, EMPTY_SIGNATURE_DATA)
         }
 
@@ -153,13 +175,10 @@ class UportHDSigner : UportSigner() {
 
                 val sigData = keyPair.signMessage(txBytes)
                 return@decrypt callback(null, sigData)
-
             } catch (signError: Exception) {
                 return@decrypt callback(signError, EMPTY_SIGNATURE_DATA)
             }
-
         }
-
     }
 
     /**
@@ -172,16 +191,27 @@ class UportHDSigner : UportSigner() {
      * The decryption UI can be a device lockscreen or fingerprint-dialog depending on the level of encryption
      * requested at seed creation/import.
      *
-     * @param context The android activity from which the signature is requested or app context if it's encrypted using [KeyProtection.Level.SIMPLE]] protection
+     * @param context The android activity from which the signature is requested or app context if
+     * it's encrypted using [KeyProtection.Level.SIMPLE]] protection
      * @param rootAddress the 0x ETH address used to refer to the previously imported/created seed
      * @param data the base64 encoded byte array that represents the payload to be signed
      * @param prompt A string that needs to be displayed to the user in case user-auth is requested
      * @param callback (error, signature) called after the transaction has been signed successfully or
      * with an error and empty data when it fails
      */
-    fun signJwtBundle(context: Context, rootAddress: String, derivationPath: String, data: String, prompt: String, callback: (err: Exception?, sigData: SignatureData) -> Unit) {
+    fun signJwtBundle(
+        context: Context,
+        rootAddress: String,
+        derivationPath: String,
+        data: String,
+        prompt: String,
+        callback: (err: Exception?, sigData: SignatureData) -> Unit
+    ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
             return callback(storageError, SignatureData())
@@ -216,9 +246,18 @@ class UportHDSigner : UportSigner() {
      *
      * The results are passed back to the calling code using the provided [callback]
      */
-    fun computeAddressForPath(context: Context, rootAddress: String, derivationPath: String, prompt: String, callback: (err: Exception?, address: String, pubKey: String) -> Unit) {
+    fun computeAddressForPath(
+        context: Context,
+        rootAddress: String,
+        derivationPath: String,
+        prompt: String,
+        callback: (err: Exception?, address: String, pubKey: String) -> Unit
+    ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
             return callback(storageError, "", "")
@@ -240,13 +279,10 @@ class UportHDSigner : UportSigner() {
                 val address: String = keyPair.toAddress().hex
 
                 return@decrypt callback(null, address, publicKeyString)
-
             } catch (derivationError: Exception) {
                 return@decrypt callback(derivationError, "", "")
             }
         }
-
-
     }
 
     /**
@@ -256,9 +292,17 @@ class UportHDSigner : UportSigner() {
      *
      * The result is passed back to the calling code using the provided [callback]
      */
-    fun showHDSeed(context: Context, rootAddress: String, prompt: String, callback: (err: Exception?, phrase: String) -> Unit) {
+    fun showHDSeed(
+        context: Context,
+        rootAddress: String,
+        prompt: String,
+        callback: (err: Exception?, phrase: String) -> Unit
+    ) {
 
-        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(context, asSeedLabel(rootAddress))
+        val (encryptionLayer, encryptedEntropy, storageError) = getEncryptionForLabel(
+            context,
+            asSeedLabel(rootAddress)
+        )
 
         if (storageError != null) {
             return callback(storageError, "")
@@ -289,13 +333,13 @@ class UportHDSigner : UportSigner() {
     fun allHDRoots(context: Context): List<String> {
 
         val prefs = context.getSharedPreferences(ETH_ENCRYPTED_STORAGE, MODE_PRIVATE)
-        //list all stored keys, keep a list of what looks like uport root addresses
+        // list all stored keys, keep a list of what looks like uport root addresses
         return prefs.all.keys
-                .asSequence()
-                .filter { label -> label.startsWith(SEED_PREFIX) }
-                .filter { hasCorrespondingLevelKey(prefs, it) }
-                .map { label: String -> label.substring(SEED_PREFIX.length) }
-                .toList()
+            .asSequence()
+            .filter { label -> label.startsWith(SEED_PREFIX) }
+            .filter { hasCorrespondingLevelKey(prefs, it) }
+            .map { label: String -> label.substring(SEED_PREFIX.length) }
+            .toList()
     }
 
     companion object {

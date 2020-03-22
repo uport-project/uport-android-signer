@@ -2,8 +2,9 @@
 
 package com.uport.sdk.signer
 
+import android.app.Application
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import com.uport.sdk.signer.storage.CryptoUtil
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertTrue
@@ -17,7 +18,7 @@ class CryptoUtilTest {
 
     @Before
     fun runBeforeEachTest() {
-        context = InstrumentationRegistry.getTargetContext()
+        context = ApplicationProvider.getApplicationContext<Application>()
     }
 
     @Test
@@ -41,8 +42,6 @@ class CryptoUtilTest {
                 throw ex
             }
         }
-
         assertTrue(true)
     }
-
 }

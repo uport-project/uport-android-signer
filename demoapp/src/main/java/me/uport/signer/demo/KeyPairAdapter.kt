@@ -1,14 +1,14 @@
 package me.uport.signer.demo
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
-
-class KeyPairAdapter(context: Context, data: List<String>) : RecyclerView.Adapter<KeyPairAdapter.ViewHolder>() {
+class KeyPairAdapter(context: Context, data: List<String>) :
+    RecyclerView.Adapter<KeyPairAdapter.ViewHolder>() {
 
     private val keyPairs: MutableList<String> = listOf("").toMutableList()
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
@@ -36,9 +36,9 @@ class KeyPairAdapter(context: Context, data: List<String>) : RecyclerView.Adapte
         return keyPairs.size
     }
 
-
     // stores and recycles views as they are scrolled off screen
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
 
         var myTextView: TextView = itemView.findViewById(R.id.key_pair_item_text_field)
 

@@ -46,6 +46,11 @@ jobs:
       # upload test coverage report!
       - run: bash <(curl -s https://codecov.io/bash)
 
+      # run linter
+      - run: ./gradlew detekt
+      - store_artifacts:
+          path: ./build/reports
+
 workflows:
   version: 2
   workflow:

@@ -1,20 +1,25 @@
+@file:Suppress("TooGenericExceptionCaught", "MagicNumber")
+
 package com.uport.sdk.signer.encryption
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.security.keystore.UserNotAuthenticatedException
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.uport.sdk.signer.DecryptionCallback
 import com.uport.sdk.signer.EncryptionCallback
 import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
+import com.uport.sdk.signer.encryption.KeyProtection.Companion.canUseKeychainAuthentication
+import com.uport.sdk.signer.encryption.KeyProtection.Companion.decryptRaw
+import com.uport.sdk.signer.encryption.KeyProtection.Companion.encryptRaw
 import com.uport.sdk.signer.hasMarshmallow
 import java.security.InvalidKeyException
 
-class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_TIMEOUT_SECONDS) : KeyProtection() {
+class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_TIMEOUT_SECONDS) :
+    KeyProtection {
 
     override
     val alias = "__keyguard_asymmetric_key_alias__"
@@ -36,6 +41,7 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
         generateWrappingKey(context, extendedAlias, true, sessionTimeout)
     }
 
+    @Suppress("TooGenericExceptionCaught")
     override
     fun encrypt(context: Context, purpose: String, blob: ByteArray, callback: EncryptionCallback) {
         try {
@@ -62,48 +68,53 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
         }
     }
 
-
-    private fun decryptAfterKeyguard(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback, retriesLeft : Int = 1) {
+    private fun decryptAfterKeyguard(
+        context: Context,
+        purpose: String,
+        ciphertext: String,
+        callback: DecryptionCallback,
+        retriesLeft: Int = 1
+    ) {
         if (context is AppCompatActivity) {
             showKeyguard(
-                    context,
-                    purpose,
-                    object : KeyguardLaunchFragment.KeyguardCallback {
-                        override fun onKeyguardResult(unlocked: Boolean) {
-                            if (unlocked) {
-                                try {
-                                    val cleartextBytes = decryptRaw(ciphertext, extendedAlias)
-                                    //only update if there was no exception
-                                    updateUnlock(extendedAlias)
-                                    //finally decrypted.. phew
-                                    callback(null, cleartextBytes)
-                                } catch (exception: Exception) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                                        exception is UserNotAuthenticatedException
-                                    ) {
-                                        if (retriesLeft > 0) {
-                                            // re-prompt for authorization if we're still in an unauthorized state.
-                                            // This can happen if the device is too slow and overshoots
-                                            // the authorization window
-                                            decryptAfterKeyguard(
-                                                context,
-                                                purpose,
-                                                ciphertext,
-                                                callback,
-                                                retriesLeft - 1
-                                            )
-                                        } else {
-                                            callback(exception, ByteArray(0))
-                                        }
+                context,
+                purpose,
+                object : KeyguardLaunchFragment.KeyguardCallback {
+                    override fun onKeyguardResult(unlocked: Boolean) {
+                        if (unlocked) {
+                            try {
+                                val cleartextBytes = decryptRaw(ciphertext, extendedAlias)
+                                // only update if there was no exception
+                                updateUnlock(extendedAlias)
+                                // finally decrypted.. phew
+                                callback(null, cleartextBytes)
+                            } catch (exception: Exception) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                                    exception is UserNotAuthenticatedException
+                                ) {
+                                    if (retriesLeft > 0) {
+                                        // re-prompt for authorization if we're still in an unauthorized state.
+                                        // This can happen if the device is too slow and overshoots
+                                        // the authorization window
+                                        decryptAfterKeyguard(
+                                            context,
+                                            purpose,
+                                            ciphertext,
+                                            callback,
+                                            retriesLeft - 1
+                                        )
                                     } else {
                                         callback(exception, ByteArray(0))
                                     }
+                                } else {
+                                    callback(exception, ByteArray(0))
                                 }
-                            } else {
-                                callback(RuntimeException(UportSigner.ERR_AUTH_CANCELED), ByteArray(0))
                             }
+                        } else {
+                            callback(RuntimeException(UportSigner.ERR_AUTH_CANCELED), ByteArray(0))
                         }
-                    })
+                    }
+                })
         } else {
             callback(IllegalStateException(ERR_ACTIVITY_DOES_NOT_EXIST), ByteArray(0))
         }
@@ -111,14 +122,19 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
 
     @Suppress("NestedBlockDepth", "ComplexMethod")
     override
-    fun decrypt(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
+    fun decrypt(
+        context: Context,
+        purpose: String,
+        ciphertext: String,
+        callback: DecryptionCallback
+    ) {
         try {
             if (hasMarshmallow()) {
                 try {
                     val cleartextBytes = decryptRaw(ciphertext, extendedAlias)
                     callback(null, cleartextBytes)
                 } catch (exception: InvalidKeyException) {
-                    @SuppressLint("NewApi")
+                    @Suppress("NewApi")
                     if (exception is UserNotAuthenticatedException) {
                         decryptAfterKeyguard(context, purpose, ciphertext, callback)
                     } else {
@@ -134,19 +150,23 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
                 }
             }
         } catch (exception: Exception) {
-            //TODO: possible scenario to address: if the device has just configured PIN and has never been unlocked, this may throw IllegalBlockSizeException
+            // TODO: possible scenario to address: if the device has just configured PIN and has
+            // never been unlocked, this may throw IllegalBlockSizeException
             return callback(exception, ByteArray(0))
         }
     }
 
-    private fun showKeyguard(activity: Activity, purpose: String, callback: KeyguardLaunchFragment.KeyguardCallback) {
+    private fun showKeyguard(
+        activity: Activity,
+        purpose: String,
+        callback: KeyguardLaunchFragment.KeyguardCallback
+    ) {
         val supportFragmentManager = (activity as AppCompatActivity).supportFragmentManager
         KeyguardLaunchFragment.show(supportFragmentManager, purpose, callback)
     }
 
-
     companion object {
-        private const val DEFAULT_SESSION_TIMEOUT_SECONDS: Int = 30 //seconds
+        private const val DEFAULT_SESSION_TIMEOUT_SECONDS: Int = 30 // seconds
 
         private val lastUnlock = mapOf<String, Long>().toMutableMap()
 
@@ -159,7 +179,5 @@ class KeyguardAsymmetricProtection(sessionTimeoutSeconds: Int = DEFAULT_SESSION_
         private fun updateUnlock(alias: String) {
             lastUnlock[alias] = System.currentTimeMillis()
         }
-
     }
-
 }

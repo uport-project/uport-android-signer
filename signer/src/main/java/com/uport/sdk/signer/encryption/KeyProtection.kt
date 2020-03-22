@@ -2,7 +2,6 @@
 
 package com.uport.sdk.signer.encryption
 
-import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
@@ -17,11 +16,10 @@ import javax.crypto.Cipher.DECRYPT_MODE
 import javax.crypto.Cipher.ENCRYPT_MODE
 import javax.crypto.IllegalBlockSizeException
 
-
 /**
  * Describes the functionality of encryption layer
  */
-abstract class KeyProtection {
+interface KeyProtection {
 
     enum class Level {
         /**
@@ -46,29 +44,42 @@ abstract class KeyProtection {
         CLOUD
     }
 
-    abstract fun genKey(context: Context)
-    abstract fun encrypt(context: Context, purpose: String = "", blob: ByteArray, callback: EncryptionCallback)
-    abstract fun decrypt(context: Context, purpose: String = "", ciphertext: String, callback: DecryptionCallback)
+    fun genKey(context: Context)
+    fun encrypt(
+        context: Context,
+        purpose: String = "",
+        blob: ByteArray,
+        callback: EncryptionCallback
+    )
 
-    abstract val alias: String
+    fun decrypt(
+        context: Context,
+        purpose: String = "",
+        ciphertext: String,
+        callback: DecryptionCallback
+    )
+
+    val alias: String
 
     companion object {
 
         fun canUseKeychainAuthentication(context: Context): Boolean {
-            val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            val keyguardManager =
+                context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             // TODO: prompt user to setup keyguard
             return keyguardManager.isKeyguardSecure
         }
 
-        @SuppressLint("NewApi")
+        @Suppress("NewApi", "ReturnCount")
         fun hasSetupFingerprint(context: Context): Boolean {
             if (hasMarshmallow()) {
-                val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                val mFingerprintManager =
+                    context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
                 try {
                     if (!mFingerprintManager.isHardwareDetected) {
                         return false
                     } else if (!mFingerprintManager.hasEnrolledFingerprints()) {
-                        //TODO: prompt user to enroll fingerprints
+                        // TODO: prompt user to enroll fingerprints
                         return false
                     }
                 } catch (e: SecurityException) {
@@ -83,10 +94,11 @@ abstract class KeyProtection {
             }
         }
 
-        @SuppressLint("NewApi")
+        @Suppress("NewApi")
         fun hasFingerprintHardware(context: Context): Boolean {
             return if (hasMarshmallow()) {
-                val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                val mFingerprintManager =
+                    context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
                 try {
                     mFingerprintManager.isHardwareDetected
                 } catch (e: SecurityException) {

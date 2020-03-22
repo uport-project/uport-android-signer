@@ -1,14 +1,22 @@
 package com.uport.sdk.signer
 
+import android.app.Application
 import android.content.Context
-import android.support.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import com.uport.sdk.signer.encryption.KeyProtection
-import me.uport.sdk.core.*
+import me.uport.sdk.core.decodeBase64
+import me.uport.sdk.core.hexToBigInteger
+import me.uport.sdk.core.hexToByteArray
+import me.uport.sdk.core.padBase64
+import me.uport.sdk.core.toBase64
 import me.uport.sdk.signer.decodeJose
 import me.uport.sdk.signer.getDerEncoded
 import me.uport.sdk.signer.getJoseEncoded
 import me.uport.sdk.signer.getUncompressedPublicKeyWithPrefix
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.kethereum.crypto.signMessage
@@ -27,7 +35,7 @@ class SignerTests {
 
     @Before
     fun runBeforeEachTest() {
-        context = InstrumentationRegistry.getTargetContext()
+        context = ApplicationProvider.getApplicationContext<Application>()
     }
 
     @Test
@@ -138,7 +146,6 @@ class SignerTests {
                 assertEquals(refSignature3, sig)
                 latch.countDown()
             }
-
         }
 
         latch.await(20, TimeUnit.SECONDS)
@@ -155,7 +162,6 @@ class SignerTests {
 
         assertEquals(referencePublicKey, pubKeyHex)
     }
-
 
     @Test
     fun keyImportGeneratesProperPublicKeyAndAddress() {
@@ -313,7 +319,7 @@ class SignerTests {
         val iter = 10
         val createLatch = CountDownLatch(iter)
 
-        //create and store a bunch of addresses
+        // create and store a bunch of addresses
         for (i in 0..iter) {
             val pk = ByteArray(32)
             rand.nextBytes(pk)
@@ -332,7 +338,7 @@ class SignerTests {
 
         createLatch.await(20, TimeUnit.SECONDS)
 
-        //check if the addresses are read back successfully from storage
+        // check if the addresses are read back successfully from storage
         val readLatch = CountDownLatch(1)
         val storedAddressList = LinkedList<String>()
         signer.allAddresses(
@@ -344,7 +350,6 @@ class SignerTests {
         readLatch.await(20, TimeUnit.SECONDS)
 
         assertTrue(storedAddressList.containsAll(addresses))
-
     }
 
     @Test
@@ -375,4 +380,3 @@ class SignerTests {
         latch.await(20, TimeUnit.SECONDS)
     }
 }
-

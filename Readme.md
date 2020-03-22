@@ -69,11 +69,13 @@ The seed is representable by a bip39 mnemonic phrase.
 UportHDSigner().createHDSeed(activity, KeyProtection.Level.SIMPLE, { err, seedHandle, publicKey ->
     if (err != null) {
         //handle error
+        println(err)
     } else {
         //seed has been created and is accessible using seedHandle 
         // * the handle is `seedHandle` - save this so you can use the seed later
         // * `publicKey` - a publicKey in base64 encoding, 
         // corresponding to the private key derived using the `UPORT_ROOT_DERIVATION_PATH` "m/7696500'/0'/0'/0'"
+        println(publcKey)
     } 
 })
 ```
@@ -127,6 +129,7 @@ UportHDSigner().signTransaction(activity, seedHandle, derivationPath, txPayloadB
         //handle error
     } else {
         //use sigData r,s,v components
+        println(sigData)
     }
 })
 
@@ -151,11 +154,11 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
         //process the error
     } else {
         //use sigData r,s,v components
+        println(sigData)
     }
 })
 
 ```
-
 
 ### Changelog
 

@@ -2,11 +2,18 @@ package com.uport.sdk.signer.crypto.bip39
 
 import me.uport.sdk.core.hexToByteArray
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.kethereum.bip39.*
+import org.kethereum.bip39.entropyToMnemonic
+import org.kethereum.bip39.mnemonicToEntropy
 import org.kethereum.bip39.model.MnemonicWords
+import org.kethereum.bip39.toKey
+import org.kethereum.bip39.toSeed
+import org.kethereum.bip39.validate
 import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
@@ -37,7 +44,6 @@ class MnemonicTest {
 
             assertArrayEquals(expectedSeed, actualSeed)
         }
-
     }
 
     @Test
@@ -68,19 +74,18 @@ class MnemonicTest {
             val generatedMaster = MnemonicWords(it.phrase).toKey("m/", "TREZOR")
             assertEquals(it.masterKey, generatedMaster.serialize())
 
-            //XXX: be advised, the roots generated here use the string "TREZOR" for salting.
+            // XXX: be advised, the roots generated here use the string "TREZOR" for salting.
             // The actual roots in the app will probably use something else
             val generatedUportRoot = MnemonicWords(it.phrase).toKey("m/7696500'/0'/0'/0'", "TREZOR")
             assertEquals(it.uportRoot, generatedUportRoot.serialize())
         }
-
     }
 
     @Test
     fun `can (in)validate mnemonic phrase`() {
         val phraseGood =
             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
-        //bad checksum
+        // bad checksum
         val phraseBad1 = "about about about about about about about about about about about about"
         // missing from dictionary
         val phraseBad2 = "hello world"
@@ -279,5 +284,4 @@ class MnemonicTest {
             "xprvA2GifNQTS6D2hS5DW29WckZ7zQ3KgT2dSWFBLXDMeHDmB4om7tyuXz6aSey473DopRsD86XaQb8G1oqoKbfd3ycXmqDqs3Nwo7LfKFFkdiH"
         )
     )
-
 }

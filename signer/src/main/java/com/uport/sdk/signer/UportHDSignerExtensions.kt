@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.uport.sdk.signer
 
 import android.content.Context

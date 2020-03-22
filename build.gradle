@@ -16,11 +16,11 @@ buildscript {
         test_runner_version = "1.0.2"
         test_rules_version = test_runner_version
         test_orchestrator_version = test_runner_version
-        espresso_version = "3.0.2"
+        espresso_version = "3.2.0"
         junit_version = "4.12"
         mockk_version = "1.9.3"
-        assertk_version = "0.13"
-        detekt_version = "1.0.0-RC14"
+        assertk_version = "0.22"
+        detekt_version = "1.7.0"
         jacoco_version = "0.8.4"
 
         spongycastle_version = "1.58.0.0"
@@ -59,8 +59,7 @@ detekt {
     input = files(
             "$projectDir"
     )
-    //config = "${projectDir}/detekt.yml"
-    filters = ".*test.*,.*/resources/.*,.*/tmp/.*,.*/build/.*"
+    config = files("${projectDir}/detekt.yml")
     parallel = true
     reports {
         xml {
@@ -72,6 +71,11 @@ detekt {
             destination = file("${project.buildDir}/reports/detekt.html")
         }
     }
+}
+
+tasks.withType(io.gitlab.arturbosch.detekt.Detekt) {
+    exclude("**/test/**")
+    exclude("**/androidTest/**")
 }
 
 allprojects {
