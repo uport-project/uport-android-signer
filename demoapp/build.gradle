@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -46,11 +47,7 @@ android {
     }
 
     packagingOptions {
-        pickFirst "META-INF/main.kotlin_module"
-        pickFirst "META-INF/atomicfu.kotlin_module"
-        pickFirst "META-INF/kotlinx-io.kotlin_module"
-        pickFirst "META-INF/extensions.kotlin_module"
-        pickFirst "META-INF/core.kotlin_module"
+        pickFirst "META-INF/*.kotlin_module"
     }
 }
 
@@ -64,7 +61,7 @@ dependencies {
 
     //used to generate and encode seeds to demonstrate importing them
     implementation "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
-    implementation "com.github.komputing.khex:extensions-jvm:$khex_version"
+    implementation "com.github.komputing.khex:extensions:$khex_version"
     implementation "com.github.komputing.kethereum:bip39:$kethereum_version"
     implementation "com.github.komputing.kethereum:bip39_wordlist_en:$kethereum_version"
 

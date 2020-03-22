@@ -63,8 +63,8 @@ dependencies {
     api "com.github.komputing.kethereum:model:$kethereum_version"
 
     implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
-    implementation "com.github.komputing.kethereum:extensions:$kethereum_version"
-    implementation "com.github.komputing.kethereum:hashes:$kethereum_version"
+    implementation "com.github.komputing.kethereum:extensions_kotlin:$kethereum_version"
+    implementation "com.github.komputing.khash:sha256:$khash_version"
     api "com.github.uport-project.kotlin-common:signer-common:$kotlin_common_version"
     implementation "com.github.uport-project.kotlin-common:core:$kotlin_common_version"
     implementation "com.madgag.spongycastle:prov:$spongycastle_version"
@@ -73,9 +73,9 @@ dependencies {
     androidTestImplementation "com.android.support.test:rules:$test_rules_version"
     androidTestImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
     androidTestImplementation "com.github.uport-project.kotlin-common:test-helpers:$kotlin_common_version"
-    androidTestImplementation "com.github.komputing.khex:extensions-jvm:$khex_version"
+    androidTestImplementation "com.github.komputing.khex:extensions:$khex_version"
 
     testImplementation "com.willowtreeapps.assertk:assertk-jvm:$assertk_version"
-    testImplementation "com.github.komputing.kethereum:bip44:$kethereum_version"
-    testImplementation "com.github.komputing.khex:extensions-jvm:$khex_version"
+    testImplementation "com.github.komputing:kbip44:$kbip44_version"
+    testImplementation "com.github.komputing.khex:extensions:$khex_version"
 }
