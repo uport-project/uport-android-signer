@@ -1,4 +1,4 @@
-@file:Suppress("TooManyFunctions")
+@file:Suppress("TooManyFunctions", "TooGenericExceptionCaught", "ReturnCount")
 
 package com.uport.sdk.signer.storage
 
@@ -20,7 +20,7 @@ class ProtectedSharedPreferences(
     val crypto = CryptoUtil(context)
 
     init {
-        //encrypt all previously nonencrypted data
+        //encrypt all previously non-encrypted data
         delegate.all.entries
                 .filter { (k, v) -> k != null && v != null }
                 .filter { (k, _) -> !k.matches(Regex("^[sbifle]:.*")) }
@@ -219,17 +219,25 @@ class ProtectedSharedPreferences(
                 .toMutableMap()
     }
 
-    override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
+    override fun registerOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener?
+    ) {
         //todo: listener will be called with wrong keys; they need to be decrypted before calling
         delegate.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
+    override fun unregisterOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener?
+    ) {
         //todo: listener will be called with wrong keys; they need to be decrypted before calling
         delegate.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
-    class EncryptedEditor(private var delegate: SharedPreferences.Editor, val crypto: CryptoUtil) : SharedPreferences.Editor {
+    class EncryptedEditor(
+        private var delegate: SharedPreferences.Editor,
+        val crypto: CryptoUtil
+    ) :
+        SharedPreferences.Editor {
 
         override fun clear(): SharedPreferences.Editor {
             delegate.clear()

@@ -241,7 +241,6 @@ class ProtectedSharedPreferencesTest {
         }
     }
 
-
     @Test
     fun clearsUnreadableDataOnContains() {
         val originalPrefs = context.getSharedPreferences("unreadable", MODE_PRIVATE)

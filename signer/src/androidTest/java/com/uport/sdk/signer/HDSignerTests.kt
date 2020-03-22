@@ -116,7 +116,6 @@ class HDSignerTests {
         assertEquals(referenceS, sigData.s)
     }
 
-
     @Test
     fun testSeedImportAndUsage() {
         val referenceSeedPhrase =
@@ -128,7 +127,6 @@ class HDSignerTests {
             )
 
         val referencePayload = "Hello world".toBase64().padBase64()
-
 
         val latch = CountDownLatch(1)
 
@@ -242,5 +240,4 @@ class HDSignerTests {
         latch.await()
 
     }
-
 }

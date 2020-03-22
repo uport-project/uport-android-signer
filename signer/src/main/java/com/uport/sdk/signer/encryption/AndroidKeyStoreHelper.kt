@@ -1,8 +1,7 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "MagicNumber")
 
 package com.uport.sdk.signer.encryption
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.security.KeyPairGeneratorSpec
@@ -54,11 +53,11 @@ object AndroidKeyStoreHelper {
      * The cipher transformation used to wrap the protected key
      */
     private val WRAPPING_TRANSFORMATION =
-            if (hasMarshmallow())
+            if (hasMarshmallow()) {
                 "RSA/ECB/OAEPWithSHA-256AndMGF1Padding"
-            else
+            } else {
                 "RSA/ECB/PKCS1Padding"
-
+            }
 
     @Throws(KeyStoreException::class,
             NoSuchProviderException::class,
@@ -95,10 +94,10 @@ object AndroidKeyStoreHelper {
             Cipher.DECRYPT_MODE, Cipher.UNWRAP_MODE -> {
                 keyStore.getKey(keyAlias, null) as PrivateKey
             }
-            //ENCRYPT_MODE, WRAP_MODE
+            // ENCRYPT_MODE, WRAP_MODE
             else -> {
                 val pubKey = keyStore.getCertificate(keyAlias).publicKey
-                //due to a bug in API23, the public key needs to be separated from the keystore
+                // due to a bug in API23, the public key needs to be separated from the keystore
                 KeyFactory.getInstance(pubKey.algorithm)
                         .generatePublic(X509EncodedKeySpec(pubKey.encoded)) as PublicKey
             }
@@ -113,12 +112,19 @@ object AndroidKeyStoreHelper {
         return cipher
     }
 
-    @SuppressLint("NewApi")
-    @Throws(KeyStoreException::class,
-            NoSuchProviderException::class,
-            NoSuchAlgorithmException::class,
-            InvalidAlgorithmParameterException::class)
-    fun generateWrappingKey(context: Context, keyAlias: String, requiresAuth: Boolean = false, sessionTimeout: Int = -1) {
+    @Suppress("NewApi")
+    @Throws(
+        KeyStoreException::class,
+        NoSuchProviderException::class,
+        NoSuchAlgorithmException::class,
+        InvalidAlgorithmParameterException::class
+    )
+    fun generateWrappingKey(
+        context: Context,
+        keyAlias: String,
+        requiresAuth: Boolean = false,
+        sessionTimeout: Int = -1
+    ) {
 
         val keyStore = getKeyStore()
         val publicKey = keyStore.getCertificate(keyAlias)?.publicKey
@@ -127,11 +133,11 @@ object AndroidKeyStoreHelper {
 
             val spec = if (hasMarshmallow()) {
                 KeyGenParameterSpec.Builder(keyAlias, KeyProperties.PURPOSE_DECRYPT)
-                        .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-                        .setUserAuthenticationRequired(requiresAuth)
-                        .setUserAuthenticationValidityDurationSeconds(sessionTimeout)
-                        .build()
+                    .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
+                    .setUserAuthenticationRequired(requiresAuth)
+                    .setUserAuthenticationValidityDurationSeconds(sessionTimeout)
+                    .build()
             } else {
                 val cal = Calendar.getInstance()
                 val startDate: Date = cal.time
@@ -140,14 +146,15 @@ object AndroidKeyStoreHelper {
 
                 @Suppress("DEPRECATION")
                 val specBuilder = KeyPairGeneratorSpec.Builder(context)
-                        .setAlias(keyAlias)
-                        .setSubject(X500Principal("CN=$keyAlias"))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(startDate)
-                        .setEndDate(endDate)
+                    .setAlias(keyAlias)
+                    .setSubject(X500Principal("CN=$keyAlias"))
+                    .setSerialNumber(BigInteger.ONE)
+                    .setStartDate(startDate)
+                    .setEndDate(endDate)
                 // Only API levels 19 and above allow specifying RSA key parameters.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    val rsaSpec = RSAKeyGenParameterSpec(WRAPPING_KEY_SIZE, RSAKeyGenParameterSpec.F4)
+                    val rsaSpec =
+                        RSAKeyGenParameterSpec(WRAPPING_KEY_SIZE, RSAKeyGenParameterSpec.F4)
                     specBuilder.setAlgorithmParameterSpec(rsaSpec)
                     specBuilder.setKeySize(WRAPPING_KEY_SIZE)
                 }

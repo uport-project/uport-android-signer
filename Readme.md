@@ -156,7 +156,6 @@ UportHDSigner().signJwtBundle(activity, seedHandle, derivationPath, data, prompt
 
 ```
 
-
 ### Changelog
 
 #### 0.3.6

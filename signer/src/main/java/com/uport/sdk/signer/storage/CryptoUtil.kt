@@ -26,7 +26,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
-
 class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
     private val appContext = context.applicationContext
@@ -62,7 +61,8 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
 
             val secretKey = keyStore.getKey(alias, null) ?: genEncryptionKey()
             cipher.init(ENCRYPT_MODE, secretKey)
-            //FIXME: On some devices (like emulator with API 24 & 26) this throws IllegalBlockSizeException for large blobs (ex 4096 bytes)
+            //FIXME: On some devices (like emulator with API 24 & 26) this throws
+            // IllegalBlockSizeException for large blobs (ex 4096 bytes)
             val encryptedBytes = cipher.doFinal(blob)
 
             return packCiphertext(cipher.iv, encryptedBytes)
@@ -82,7 +82,6 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
             return packCiphertext(wrappedKey, encryptingCipher.iv, encryptedBlob)
         }
     }
-
 
     fun decrypt(ciphertext: String): ByteArray {
 
@@ -125,6 +124,4 @@ class CryptoUtil(context: Context, private val alias: String = DEFAULT_ALIAS) {
         private const val AES_TRANSFORMATION = "$ALGORITHM_AES/$BLOCK_MODE/$BLOCK_PADDING"
 
     }
-
-
 }

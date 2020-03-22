@@ -161,5 +161,4 @@ class ExtendedKeyTest {
 
         assertArrayEquals(destBuffArray, destinationSimple)
     }
-
 }

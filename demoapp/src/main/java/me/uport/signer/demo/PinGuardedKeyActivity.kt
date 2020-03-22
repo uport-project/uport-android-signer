@@ -40,6 +40,7 @@ class PinGuardedKeyActivity : AppCompatActivity() {
         signBtn.setOnClickListener {
 
             //random payload to be signed
+            @Suppress("MagicNumber")
             val msgBytes = ByteArray(3139).also { Random().nextBytes(it) }
 
             //needs to be wrapped as a base64 string
@@ -50,7 +51,8 @@ class PinGuardedKeyActivity : AppCompatActivity() {
                     hdSeedHandle,
                     "m/44'/60'/0'/0/0",
                     b64Payload,
-                    "${getString(R.string.app_name)} is requesting your approval to sign a random string of bits with a newly minted key"
+                    "${getString(R.string.app_name)} is requesting your approval to sign a random " +
+                            "string of bits with a newly minted key"
             ) { err, sigData ->
                 if (err == null) {
                     sign_result.text = "success : $sigData"
@@ -59,7 +61,5 @@ class PinGuardedKeyActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
 }

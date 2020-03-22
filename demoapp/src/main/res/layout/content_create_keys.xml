@@ -84,5 +84,4 @@
         app:layout_constraintStart_toStartOf="@+id/mnemonicPhraseField"
         app:layout_constraintTop_toBottomOf="@+id/publicKeyField" />
 
-
 </android.support.constraint.ConstraintLayout>

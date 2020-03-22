@@ -279,5 +279,4 @@ class MnemonicTest {
             "xprvA2GifNQTS6D2hS5DW29WckZ7zQ3KgT2dSWFBLXDMeHDmB4om7tyuXz6aSey473DopRsD86XaQb8G1oqoKbfd3ycXmqDqs3Nwo7LfKFFkdiH"
         )
     )
-
 }

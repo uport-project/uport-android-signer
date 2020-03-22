@@ -41,8 +41,6 @@ class CryptoUtilTest {
                 throw ex
             }
         }
-
         assertTrue(true)
     }
-
 }

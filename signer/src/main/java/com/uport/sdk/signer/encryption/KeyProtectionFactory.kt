@@ -73,5 +73,4 @@ object KeyProtectionFactory {
         store.genKey(context)
         return store
     }
-
 }

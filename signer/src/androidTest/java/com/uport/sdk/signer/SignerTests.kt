@@ -156,7 +156,6 @@ class SignerTests {
         assertEquals(referencePublicKey, pubKeyHex)
     }
 
-
     @Test
     fun keyImportGeneratesProperPublicKeyAndAddress() {
         val privKeyBytes =
@@ -375,4 +374,3 @@ class SignerTests {
         latch.await(20, TimeUnit.SECONDS)
     }
 }
-

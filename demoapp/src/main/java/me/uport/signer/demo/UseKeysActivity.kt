@@ -9,13 +9,16 @@ import android.widget.Toast
 import com.uport.sdk.signer.UportHDSigner
 import kotlinx.android.synthetic.main.activity_use_keys.*
 
-
 class UseKeysActivity : AppCompatActivity(), KeyPairAdapter.ItemClickListener {
 
     private lateinit var adapter: KeyPairAdapter
 
     override fun onItemClick(view: View, position: Int) {
-        Toast.makeText(this, "you clicked ${adapter.getItem(position)} on row number $position", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            this,
+            "you clicked ${adapter.getItem(position)} on row number $position",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

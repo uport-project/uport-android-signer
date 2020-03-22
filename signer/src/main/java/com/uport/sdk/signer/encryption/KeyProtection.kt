@@ -2,7 +2,6 @@
 
 package com.uport.sdk.signer.encryption
 
-import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
@@ -17,11 +16,10 @@ import javax.crypto.Cipher.DECRYPT_MODE
 import javax.crypto.Cipher.ENCRYPT_MODE
 import javax.crypto.IllegalBlockSizeException
 
-
 /**
  * Describes the functionality of encryption layer
  */
-abstract class KeyProtection {
+interface KeyProtection {
 
     enum class Level {
         /**
@@ -46,11 +44,11 @@ abstract class KeyProtection {
         CLOUD
     }
 
-    abstract fun genKey(context: Context)
-    abstract fun encrypt(context: Context, purpose: String = "", blob: ByteArray, callback: EncryptionCallback)
-    abstract fun decrypt(context: Context, purpose: String = "", ciphertext: String, callback: DecryptionCallback)
+    fun genKey(context: Context)
+    fun encrypt(context: Context, purpose: String = "", blob: ByteArray, callback: EncryptionCallback)
+    fun decrypt(context: Context, purpose: String = "", ciphertext: String, callback: DecryptionCallback)
 
-    abstract val alias: String
+    val alias: String
 
     companion object {
 
@@ -60,7 +58,7 @@ abstract class KeyProtection {
             return keyguardManager.isKeyguardSecure
         }
 
-        @SuppressLint("NewApi")
+        @Suppress("NewApi", "ReturnCount")
         fun hasSetupFingerprint(context: Context): Boolean {
             if (hasMarshmallow()) {
                 val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
@@ -83,7 +81,7 @@ abstract class KeyProtection {
             }
         }
 
-        @SuppressLint("NewApi")
+        @Suppress("NewApi")
         fun hasFingerprintHardware(context: Context): Boolean {
             return if (hasMarshmallow()) {
                 val mFingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager

@@ -77,7 +77,6 @@ class UserInteractionContextTests {
         latch.await(20, TimeUnit.SECONDS)
     }
 
-
     @Test
     fun shouldThrowOnSignJwtSimpleWhenUsingActivityDependentKey() {
 
@@ -113,5 +112,4 @@ class UserInteractionContextTests {
 
         latch.await(20, TimeUnit.SECONDS)
     }
-
 }

@@ -1,11 +1,14 @@
+@file:Suppress("TooGenericExceptionCaught")
 package com.uport.sdk.signer.encryption
 
 import android.content.Context
 import com.uport.sdk.signer.DecryptionCallback
 import com.uport.sdk.signer.EncryptionCallback
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
+import com.uport.sdk.signer.encryption.KeyProtection.Companion.decryptRaw
+import com.uport.sdk.signer.encryption.KeyProtection.Companion.encryptRaw
 
-class SimpleAsymmetricProtection : KeyProtection() {
+class SimpleAsymmetricProtection : KeyProtection {
 
     override
     val alias = "__simple_asymmetric_key_alias__"
@@ -27,7 +30,6 @@ class SimpleAsymmetricProtection : KeyProtection() {
         }
     }
 
-
     override
     fun decrypt(context: Context, purpose: String, ciphertext: String, callback: DecryptionCallback) {
         try {
@@ -37,5 +39,4 @@ class SimpleAsymmetricProtection : KeyProtection() {
             callback(ex, ByteArray(0))
         }
     }
-
 }

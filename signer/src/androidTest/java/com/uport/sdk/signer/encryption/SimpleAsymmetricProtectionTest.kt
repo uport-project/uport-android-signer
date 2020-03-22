@@ -3,18 +3,12 @@ package com.uport.sdk.signer.encryption
 import android.support.test.InstrumentationRegistry
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class SimpleAsymmetricProtectionTest {
-
-    @Before
-    fun setUp() {
-
-    }
 
     @Test
     fun encryptDecryptRandomBlobsOfMultipleSizes() {

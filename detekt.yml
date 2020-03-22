@@ -474,7 +474,7 @@ style:
     active: false
     includeLineWrapping: false
   ForbiddenComment:
-    active: true
+    active: false
     values: 'TODO:,FIXME:,STOPSHIP:'
     allowedPatterns: ''
   ForbiddenImport:
@@ -519,6 +519,7 @@ style:
   MaxLineLength:
     active: true
     maxLineLength: 120
+    excludes: '**/test/**,**/androidTest/**,**/*.Test.kt,**/*.Spec.kt,**/*.Spek.kt'
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false

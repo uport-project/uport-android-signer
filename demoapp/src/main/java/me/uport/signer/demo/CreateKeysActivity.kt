@@ -1,6 +1,5 @@
 package me.uport.signer.demo
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.uport.sdk.signer.UportHDSigner
@@ -12,10 +11,9 @@ import org.kethereum.bip39.generateMnemonic
 import org.kethereum.bip39.wordlists.WORDLIST_ENGLISH
 import org.komputing.khex.extensions.toHexString
 
-
 class CreateKeysActivity : AppCompatActivity() {
 
-    @SuppressLint("SetTextI18n")
+    @Suppress("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_keys)

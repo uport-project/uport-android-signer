@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "MagicNumber")
 
 package com.uport.sdk.signer.encryption
 

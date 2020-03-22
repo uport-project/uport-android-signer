@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION")
+@file:Suppress("DEPRECATION", "TooGenericExceptionCaught")
 
 package com.uport.sdk.signer.encryption
 
@@ -15,10 +15,11 @@ import com.uport.sdk.signer.UportSigner
 import com.uport.sdk.signer.UportSigner.Companion.ERR_ACTIVITY_DOES_NOT_EXIST
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.generateWrappingKey
 import com.uport.sdk.signer.encryption.AndroidKeyStoreHelper.getWrappingCipher
+import com.uport.sdk.signer.encryption.KeyProtection.Companion.encryptRaw
 import com.uport.sdk.signer.unpackCiphertext
 import javax.crypto.Cipher
 
-class FingerprintAsymmetricProtection : KeyProtection() {
+class FingerprintAsymmetricProtection : KeyProtection {
 
     override
     val alias = "__fingerprint_asymmetric_key_alias__"
@@ -65,11 +66,15 @@ class FingerprintAsymmetricProtection : KeyProtection() {
         }
     }
 
-
     private lateinit var fingerprintDialog: FingerprintDialog
 
     @TargetApi(Build.VERSION_CODES.M)
-    private fun showFingerprintDialog(activity: AppCompatActivity, purpose: String, cipher: Cipher, callback: (err: Exception?, FingerprintManager.CryptoObject) -> Unit) {
+    private fun showFingerprintDialog(
+        activity: AppCompatActivity,
+        purpose: String,
+        cipher: Cipher,
+        callback: (err: Exception?, FingerprintManager.CryptoObject) -> Unit
+    ) {
 
         fingerprintDialog = FingerprintDialog.create(purpose)
         fingerprintDialog.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.uport_AppDialogTheme)
@@ -94,5 +99,4 @@ class FingerprintAsymmetricProtection : KeyProtection() {
             fingerprintDialog.show(activity.supportFragmentManager, FingerprintDialog.TAG_FINGERPRINT_DIALOG)
         }
     }
-
 }

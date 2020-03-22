@@ -1,3 +1,4 @@
+@file:Suppress("SameParameterValue")
 package com.uport.sdk.signer.encryption
 
 import android.annotation.SuppressLint
@@ -102,7 +103,5 @@ class KeyguardLaunchFragment : Fragment() {
             fragment.init(purpose, callback)
             fragManager.beginTransaction().add(fragment, TAG_KEYGUARD_FRAGMENT).commit()
         }
-
-
     }
 }

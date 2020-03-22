@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
-
 class KeyPairAdapter(context: Context, data: List<String>) : RecyclerView.Adapter<KeyPairAdapter.ViewHolder>() {
 
     private val keyPairs: MutableList<String> = listOf("").toMutableList()
@@ -35,7 +34,6 @@ class KeyPairAdapter(context: Context, data: List<String>) : RecyclerView.Adapte
     override fun getItemCount(): Int {
         return keyPairs.size
     }
-
 
     // stores and recycles views as they are scrolled off screen
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
